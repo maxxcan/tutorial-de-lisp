@@ -1,0 +1,3982 @@
+#+TITLE: Tutorial de Lisp
+#+AUTHOR: Patricio Martínez
+#+EMAIL: maxxcan@gmail.com
+#+DATE: <2019-07-09 mar>
+#+LATEX_HEADER:\usepackage[spanish]{babel}
+
+* Introducción
+
+Este tutorial muestra de una forma rápida y con ejemplos las características más interesantes del lenguaje de programación Lisp. 
+
+Lisp fue inventado por el John McCarthy en el año 1958, justo después del desarrollo de FORTRAN, y fue implementado por Steve Russel en una computadora IBM 704. 
+
+Durante un tiempo hubo una gran dispersión de este lenguaje apareciendo una gran cantidad de dialectos, muchos de ellos totalmente incompatibles los unos con los otros. Así que sobre durante los años 80 y 90 se intentó llegar a un lenguaje común a todos llamado *Common Lisp*. Para saber más lo mejor es ver la [[https://en.wikipedia.org/wiki/Lisp_(programming_language)][wikipedia]].
+
+* Características de Common Lisp
+
+- Es independiente de la máquina
+- Usa una metodología de diseño iterativo y es fácilmente extensible
+- Permite actualizar los programas dinámicamente
+- Proporciona un alto nivel de corrección de errores
+- Proporciona un avanzada programación orientada a objetos
+- Proporciona un muy interesante sistemas de macros
+- Provee un amplio rango de de tipos de datos como objetos, estructuras, listas, vectores, arrays, tablas hash y símbolos
+- Está basado en expresiones
+- Proporciona una completa librería de entrada y salida
+- Proporciona un extensivo control de estructuras
+
+* Estructura del programa en Lisp
+
+Lisp funciona gracias a unas expresiones llamadas expresiones simbólicas o *s-expresiones*. Las s-expresiones están compuestas por un árbol de objetos válidos, átomos, listas y cadenas. 
+
+Cualquier s-expresión es un programa válido. Por otro lado, los programas escritos en Lisp son tanto interpretados como compilados. 
+** Un simple programa
+
+Vamos a escribir una simple s-expresión que sumará 3 números. 
+
+#+begin_src lisp 
+
+(+ 7 9 11)
+
+#+end_src 
+
+Los cual nos devolverá el resultado:
+
+#+begin_src lisp
+27 
+#+end_src
+
+** Lisp usa notación de prefijo
+
+Como vemos Lisp usa notación de prefijo también llamada notación prefija o notación polaca. Esta notación que fue inventada por el *polaco Jan Tukasiewicz* para la lógica proposicional, tiene la particularidad de que coloca los operadores a la izquierda de sus operandos. Veamos un ejemplo. 
+
+La expresión:
+
+a * (b + c) / d
+
+Se escribiría así:
+
+(/ (* a (+ b c)) d)
+
+** Evaluación de los programas Lisp
+
+La evaluación de un programa de Lisp tiene 2 partes:
+
++ Traducción del programa en texto a objetos Lisp que serán leídos por el programa.
++ Implementación de la semántica del lenguaje en términos de esos objetos un programa evaluador.
+
+El proceso de evaluación tiene los siguientes pasos:
+
++ El lector traduce las cadenas de caracteres a objetos Lisp o s-expresiones.
++ El evaluador define la sintaxis de los formularios Lisp que son construidos desde las s-expresiones. Este segundo nivel de evaluación define una sintaxis que determina cuales s-expresiones son formularios Lisp.
++ El evaluador funciona como una función que toma un formulario de Lisp válido con un argumento y devuelve un valor. Esta es la razón por que ponemos las expresiones de Lisp entre paréntesis, porque estamos enviando la expresión/formulario completo al evaluador como argumento.
+
+** Nuestro primer programa "Hola Mundo"
+
+Así vamos a crear nuestro primer fichero principal.lisp y escribir el siguiente código en él.
+
+#+begin_src lisp
+(write-line "Hola Mundo")
+(write-line "Este es nuestro primer ejemplo en lenguaje Lisp")
+
+#+end_src
+
+* Tipos de datos en Lisp
+
+En Lisp, las variables no son tipados, son objetos de datos. En Lisp los tipos de datos pueden ser categorizados como:
+
+1. Tipo escalar - Por ejemplo, tipo numérico, caracteres, símbolos, etc.
+2. Estructura de datos - Por ejemplo, listas, vectores, vectores de bits y cadenas.
+
+Cualquier variable puede tomar cualquier objeto Lisp como su valor, al menos que se decida declararlo explícitamente. 
+
+Además, no es necesario especificar el tipo de dato para una variable Lisp, sin importar, esto ayuda a expansiones de bucles, declaración de métodos y alguna otra situación que se discutirán más tarde.
+
+Los tipos de datos son puestos dentro de una jerarquía. Un tipo de datos es una colección de objetos Lisp y muchos objetos que pueden pertenecer a una colección en concreto. El predicado *typep* es usado para saber si un objeto pertenece a un tipo especificado. 
+
+La función *type-of* devuelve el tipo de dato de un objeto dato.
+
+** Tipos específicados en Lisp
+
+Los tipos especificados son símbolos definidos por el sistema para tipos de datos.
+
+| array             | fixnum     | package           | simple-string |
+| atom              | float      | pathname          | simple-vector |
+| bignum            | function   | random-state      | single-float  |
+| bit               | hash-table | ratio             | standard-char |
+| bit-vector        | integer    | rational          | stream        |
+| character         | keyword    | readtable         | string        |
+| [common]          | list       | sequence          | [string-char] |
+| compiled-function | long-float | short-float       | symbol        |
+| complex           | nill       | signed-byte       | t             |
+| cons              | null       | simple-array      | unsigned-byte |
+| double-float      | number     | simple-bit-vector | vector        |
+
+A parte de esos tipos definidos por el sistema, se pueden crear tipos de datos propios. Cuando una tipo de estructura es definida usando la función *defstruct*, el nombre del tipo de la estructura se convierte un un tipo símbolo válido. 
+
+** Ejemplos
+
+Vamos a crear el fichero llamado principal.lisp y escribir en él, el siguiente código.
+
+#+begin_src lisp
+(setq x 10)
+(setq y 34.567)
+(setq ch nil)
+(setq n 123.78)
+(setq bg 11.0e+4)
+(setq r 124/2)
+
+(print x)
+(print y)
+(print ch)
+(print n)
+(print bg)
+(print r)
+
+#+end_src
+
+Cuando ejecutemos esto el resultado será:
+
+#+begin_src lisp
+10 
+34.567
+123.78
+NIL
+110000.0
+62
+
+#+end_src
+
+Ahora vamos a ver a qué tipo de datos pertenecen las variables antes vistas.
+
+#+begin_src lisp
+(defvar x 10)
+(defvar y 34.567)
+(defvar ch nil)
+(defvar n 123.78)
+(defvar bg 11.0e+4)
+(defvar r 124/2)
+
+(print (type-of x))
+(print (type-of y))
+(print (type-of n))
+(print (type-of ch))
+(print (type-of bg))
+(print (type-of r)) 
+
+#+end_src
+
+
+Una vez ejecutado tendremos el siguiente resultado:
+
+#+begin_src lisp
+(INTEGER 0 281474976710655)
+SINGLE-FLOAT
+SINGLE-FLOAT
+NULL
+SINGLE-FLOAT
+(INTEGER 0 281474976710655) 
+
+#+end_src
+
+* Macros en Lisp
+
+Las macros permiten extender la sintaxis del estándar Lisp. 
+
+Técnicamente, un macro es una función que toma una s-expresión como argumento y devuelve un formulario Lisp, el cual es evaluado. En la práctica se asemeja mucho a una función, sin embargo, en vez de representar una expresión que es evaluada, representa una transformación del código fuente del programa. 
+
+** Definiendo una macro
+En Lisp, una macro es definida usando otra macro llamada *defmacro*. La sintaxis es la siguiente:
+
+#+begin_src lisp
+(defmacro nombre-macro (lista-de-parámetros)
+"Documentación -Opcional-"
+Cuerpo del macro)
+#+end_src
+
+*** Ejemplos
+
+Vamos a escribir una simple macro llamada setTo10, la cual toma un número y establece su valor a 10.
+
+#+begin_src lisp
+  (defmacro setTo10(num)
+    (setq num 10)(print num))
+
+  (setq x 25)
+  (print x)
+  (setTo10 x)
+
+#+end_src
+
+* Variables en Lisp
+
+En Lisp, cada variable es representada por un *símbolo*. Los nombre de la variable es el nombre del símbolo y es guardada en la célula de guardado de el símbolo. 
+
+** Variables globales
+
+Las variables globales son valores permanentes a través del sistema Lisp y permanecen hasta que un nuevo valor es especificado.
+
+Las variables globales son generalmente declaradas usando el constructor *defvar*  
+
+Por ejemplo:
+
+#+BEGIN_SRC lisp
+(defvar x 234)
+(write x)
+#+END_SRC
+
+También podemos especificar el valor de un símbolo con el constructor *setq* 
+
+Por ejemplo:
+
+#+BEGIN_SRC lisp
+(setq x 10)
+#+END_SRC
+
+Una vez asignado el valor 10 a la variable x, podemos hacer referencia a la variable usando el símbolo en sí mismo como una expresión. Así podemos acceder al valor almacenado en la variable x.
+
+Por ejemplo:
+
+#+BEGIN_SRC lisp
+(setq x 10)
+(setq y 20)
+(format t "x = ~2d y = ~2d ~%" x y)
+
+(setq x 100)
+(setq y 200)
+(format t "x = ~2d y = ~2d ~%" x y)
+#+END_SRC
+
+** Variables locales
+
+Las variables locales son definidas en un método dado. Los parámetros como argumentos de una definición de función son también variables locales. Las variables locales son accesibles solo dentro de la función respectiva.
+
+Como las variables globales, las variables locales también pueden ser creadas usando el constructor *setq* 
+
+Hay otros 2 constructores - *let* y *prog* para crear variables locales.
+
+El constructor let sigue la siguiente sintaxis.
+
+#+BEGIN_SRC lisp
+(let ((variable1 valor1) (variable2 valor2)))
+#+END_SRC
+
+Cuando let es ejecutado, cada variable es asignada a su respectivo valor y finalmente la s-expresión es evaluada. El valor de la última expresión evaluada es devuelto.
+
+Si no se incluye el valor inicial para una variable, se le asigna a *nil*.
+
+Ejemplo:
+
+#+BEGIN_SRC lisp
+(let ((x 'a) (y 'b)(z 'c))
+(format t "x = ~a y = ~a z = ~a" x y z))
+#+END_SRC
+
+El resultado será:
+
+#+BEGIN_SRC lisp
+x = A y = B z = C
+#+END_SRC
+
+
+El constructor *prog* también tiene una lista de variables locales  como primer argumento, el cual es seguido del cuerpo de *prog*, y un número de s-expresiones.
+
+La función prog ejecuta la lista de s-expresiones en secuencia y devuelve nil a menos que encuentre una función llamada *return*. Entonces el argumento de la función *return* es evaluado y devuelto. 
+
+Veamos el siguiente ejemplo:
+
+#+BEGIN_SRC lisp
+  (prog ((x '(a b c))(y '(1 2 3))(z '(p q 10)))
+     (format t "x = ~a y = ~a z = ~a" x y z))
+#+END_SRC
+
+Una vez ejecutado el resultado será:
+
+#+begin_src lisp
+x = (A B C) y = (1 2 3) z = (P Q 10)
+
+#+end_src
+
+* Constantes en Lisp
+
+En Lisp, las constantes son variables que nunca cambia su valor durante la ejecución de un programa. Las constantes son declaradas usando el constructor *defconstant* 
+
+** Ejemplo
+
+En el siguiente ejemplo vamos a declara la constante global Pi que usaremos más tarde su valor dentro de una función llamada *area-circulo* que calcula el área de un círculo dado su radio.
+
+El constructor *defun* es usado para definir una función como ya veremos más adelante
+
+Vamos a crear el siguiente código:
+
+#+BEGIN_SRC lisp
+  (defconstant PI 3.141592)
+  (defun area-circulo(radio)
+    (terpri)
+    (format t "Radio: ~5f" radio)
+    (format t "~%Area: ~10f" (* PI radio radio)))
+
+  (area-circulo 10)
+#+END_SRC
+
+* Operadores en Lisp
+
+Un operador es un símbolo que le dice al compilador que desempeñe un manipulación lógica o matemática específica. Lisp permite numerosas operaciones en datos, soportada por varias funciones, macros y otros constructores.
+
+las operaciones permitidas en datos pueden ser categorizadas como:
+
++ Operaciones aritméticas
++ Operaciones de comparación
++ Operaciones lógicas
++ Operaciones bit a bit
+
+
+** Operaciones aritméticas
+
+La siguiente tabla muestra todas las operaciones aritméticas que son soportadas por Lisp. Como ejemplo tomaremos la variable A con valor 10 y la variable B con valor 20:
+
+| Operador | Descripción                                              | Ejemplo            |
+|----------+----------------------------------------------------------+--------------------|
+| +        | Suma dos operandos                                       | (+ A B) dará 30    |
+| -        | Resta el segundo operando al primero                     | (- A B) dará -10   |
+| *        | Multiplica ambos operandos                               | (* A B) dará 200   |
+| /        | Divide el numerador por el denominador                   | (/ A B) dará 2     |
+| mod.rem  | Operador modulo o resto después de una división          | (mod B A) dará 0   |
+| incf     | El valor entero es incrementado por el segundo argumento | (incf A 3) dará 13 |
+| decf     | El valor entero es decrementado por el segundo argumento | (decf A 4) dará 9  |
+
+** Operadores de comparación
+
+La siguiente tabla muestra todos los operadores relacionales de Lisp que comparan varios números. Sin embargo, a diferencia de otros operadores relacionales en otros lenguajes, los operadores de comparación en Lisp pueden tomar más de dos operadores y trabajan sólo con números.
+
+Asumiendo que A sigue valiendo 10 y B 20, entonces:
+
+| Operador | Descripción                                                                              | Ejemplo               |
+|----------+------------------------------------------------------------------------------------------+-----------------------|
+| =        | Comprueba si los valores de los operadores son iguales o no,                             | (= A B) no dará true  |
+| /=       | Comprueba si los valores de los operadores son distintos o no                            | (/= A B) es true      |
+| >        | Comprueba si los valores de los operadores son monotónicamente decrecientes              | (> A B) no es true    |
+| <        | Comprueba si los valores de los operadores son monotónicamente crecientes                | (< A B) es true       |
+| >=       | Comprueba si el valor del operando de la izquierda es mayor o igual que el de la derecha | (>= A B) no es true   |
+| <=       | Comprueba si el valor del operando de la izquierda es menor o igual que el de la derecha | (<= A B) es true      |
+| max      | Comparando dos o más argumentos y se devuelve el valor mínimo                            | (max A B) devuelve 20 |
+| min      | Comparando dos o más argumentos y se devuelve el valor mínimo                            | (min A B) devuelve 10 |
+
+** Operadores lógicos sobre valores Booleanos
+
+Common Lisp nos ofrece tres operadores lógicos: *and, or, y not* que operan sobre valores booleanos. Asumiendo que A tiene un valor nil y B tiene un valor de 5, entonces:
+
+| Operador | Descripción                                                                                                                                                                                    | Ejemplo            |
+|----------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------|
+| and      | Cogen un número de argumentos. Los argumentos son evaluados de izquierda a derecha. Si todos los argumentos no son nil entonces devolverá el último argumento. En caso contrario devolverá NIL | (and A B) dará NIL |
+| or       | Coge un número de argumentos. Los argumentos son evaluados de izquierda a derecha.  Cuando evalúa un no-nil, ese valor será devuelto. En caso distinto devolverá nil                           | (or A B) dará 5    |
+| not      | Toma un argumento y devuelve *t* si el argumento evalúa a nil                                                                                                                                  | (no A) dará T      |
+
+* Toma de decisiones en Lisp
+
+Las estructuras de toma de decisiones requiere que el programador especifica una o más condiciones que serán evaluadas o testadas por el programa, con un declaración o declaraciones que serán ejecutadas si la condición es determinada a ser cierta y opcionalmente otra declaración para el caso de que la condición sea falsa.
+
+A continuación la forma general de una típica estructura de decisión en la mayoría de los lenguajes de programación.
+
+[[./img/lisp-cond.jpg]]
+
+
+Lisp nos ofrece los siguientes tipos de constructores para hacer decisiones. 
+
+| Constructor | Descripción                                                                                                                                                |
+|-------------+------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| cond        | Este constructor es usado para chequear múltiples test y acciones. Puede ser comparado con los if anidados de otros lenguajes                              |
+| if          | El constructor if tiene varias formas. La más simple es seguido por una clausura test, un test acción y alguna otra acción consecuente.                    |
+| when        | En su forma más simple es seguido por una clausura test y un acción test. Si la clausura test es evaluada a verdadero entonces es test acción es ejecutado |
+| case        | Este constructor implementa múltiples test acción al igual que el constructor cond. Sin embargo, una forma clave y permite múltiples acciones basadas en la evaluación de esa forma clave |
+
+
+
+** Constructor Cond
+
+El constructor *cond* en LISP es el más común usado que permite ramificaciones de acciones.
+
+La sintaxis básica es:
+
+#+BEGIN_SRC lisp
+      (cond (test1 action1)
+            (test2 action2)
+            ..
+            (testn actionn))
+#+END_SRC
+
+Cada cláusula consiste en un test condicional y una acción para ser ejecutada.
+
+Si el primer test es evaluado a true (verdadero), entonces la acción relacionada será ejecutada. Este valor será devuelto y el resto de las cláusulas serán ignoradas. 
+
+En cambio, si al evaluar el primer test éste evalúa a nil (falso), entonces el control se mueve a la segunda cláusula sin que se ejecute la primera acción. 
+
+Si ninguno de los test da como resultado true, entonces se devolverá nil.
+
+*** Ejemplo
+
+Vamos a crear el siguiente código:
+
+#+BEGIN_SRC lisp
+  (setq a 10)
+  (cond ((> a 20)
+        (format t "~% a es mayor que 20"))
+        (t (format t "~% valor de a es ~d" a)))
+#+END_SRC
+
+Cuando ponemos *t* en la segunda cláusula nos aseguramos que la última acción es realizada si no ocurren las previas.
+
+** Constructor if
+
+El macro if es seguido por una cláusula que evalúa a t o nil (verdadero o falso). Si el test es evaluado a t, entonces la acción siguiente será ejecutada. Si es nil, la siguiente cláusula será evaluada. 
+
+Sintaxis:
+
+#+BEGIN_SRC lisp
+(if (test-cláusula) (acción1) (acción2))
+#+END_SRC
+
+*** Ejemplos
+
+Ejemplo 1. 
+
+#+BEGIN_SRC lisp
+  (setq a 10)
+  (if (> a 20)
+      (format t "~% a es menor que 20"))
+  (format t "~% vlaor de a es ~d" a)
+#+END_SRC
+
+Resultado:
+
+#+BEGIN_SRC lisp
+valor de a es 10
+#+END_SRC
+
+
+Ejemplo 2
+
+Si la cláusula if es seguido de una cláusula opcional *then* 
+
+#+begin_src lisp
+
+  (setq a 10)
+  (if (> a 20)
+      then (format t "~% a es menor que 20"))
+  (format t "~% valor de a es ~d" a)
+
+#+end_src
+
+Resultado:
+
+#+BEGIN_SRC lisp
+a es menor que 20
+valor de a es 10
+#+END_SRC
+
+Ejemplo 3. 
+
+ Podemos crear una declaración del tipo if-then-else. 
+
+Veamos el siguiente ejemplo:
+
+#+BEGIN_SRC lisp
+  (setq a 100)
+  (if (> a 20)
+      (format t "~% a es mayor que 20")
+      (format t "~% a es menor que 20"))
+  (format t "~% el valor de a es ~d" a)
+#+END_SRC
+
+** Constructor when
+
+El macro *when* es seguido por una cláusula test que evalúa a t o nil. Si la cláusula test es evaluado a nil, entonces la forma no será evaluada y nil será devuelto, sin embargo si el resultado es t, entonces la acción que sigue a la cláusula será ejecutada.
+
+La sintaxis del macro when es:
+
+#+BEGIN_SRC lisp
+(when (cláusula-test) (acción))
+#+END_SRC
+
+Veamoslo en un ejemplo:
+
+#+BEGIN_SRC lisp
+  (setq a 100)
+  (when (> a 20)
+    (format t "~% a es mayor que 20"))
+  (format t "~% el valor de a es ~d" a)
+#+END_SRC
+
+** Constructor case
+
+El constructor *case* implementa múltiples cláusula test-acciones como el constructor cond. Sin embargo, se evalúa un formulario clave y permite múltiples acciones basadas en la evaluación de ese formulario clave. 
+
+La sintaxis es:
+
+#+BEGIN_SRC lisp
+  (case (keyform)
+    ((key1) (acción1 acción2 ... ))
+    ((key2) (acción1 acción2 ... ))
+    ...
+    ((key-n) (acción1 acción2 ...)))
+#+END_SRC
+
+*** Ejemplo
+
+Veamos el siguiente ejemplo: 
+
+ #+BEGIN_SRC lisp
+   (setq day 4)
+   (case day
+     (1 (format t "~% Lunes"))
+     (2 (format t "~% Martes"))
+     (3 (foramt t "~% Miércoles"))
+     (4 (format t "~% Jueves"))
+     (5 (format t "~% Viernes"))
+     (6 (format t "~% Sábado"))
+     (7 (format t "~% Domingo")))
+#+END_SRC
+
+* Bucles en Lisp
+
+Hay situaciones donde podemos necesitar ejecutar un bloque de código un número de veces. Una declaración bucle nos permite ejecutar una declaración o grupo de ellos múltiples veces.
+
+Lisp nos ofrece los siguientes tipos de constructores para manejar bucles. 
+
+| Constructor | Descripción                                                                                            |
+| loop        | Esta es la forma más simple de hacer un bucle. Ejecuta una declaración hasta que encuentra un *return* |
+| loop for    | Nos permite implementar un bucle for similar a los de los lenguajes de programación más comunes        |
+| do          | También es usado para implementar bucles.                                                              |
+| dotimes     | Nos permiete hacer un bucle un número determinado de veces                                             |
+| dolist      | Nos permite hacer iteraciones con cada elemento de una lista                                                   |
+
+** Constructor Loop
+
+El constructor Loop es la forma más simple de generar una iteración en Lisp. Éste permite ejecutar una declaración un número de veces hasta que encuentra la declaración *return* 
+
+Su sintaxis es la siguiente:
+
+#+BEGIN_SRC lisp
+(loop (s-expresión))
+#+END_SRC
+
+*** Ejemplo
+
+Vamos a crear el siguiente código:
+
+#+BEGIN_SRC lisp
+  (setq a 10)
+  (loop 
+    (setq a (+ a 1))
+    (write a)
+    (terpri)
+    (when (> a 17) (return a))
+    )
+#+END_SRC
+
+Cuando ejecutamos el código el resultado es:
+
+#+begin_src lisp
+
+11
+12
+13
+14
+15
+16
+17
+18
+
+#+end_src
+
+si no añadimos la declaración *return* el macro loop haría un bucle infinito.
+
+** Constructor Loop For
+
+El constructor Loop For nos permite implementar un bucle for tal como en la mayoría de los lenguajes de programación.
+
+Esto nos permite:
+
++ Actualizar variables por iteración.
++ Especificar expresiones que condicionalmente terminan la iteración.
++ Especificar expresiones para implementar algún trabajo en cada iteración.
++ Especificar expresiones que hacen algún trabajo antes de la salida del bucle.
+
+
+El bucle loop for tiene la siguiente sintaxis
+
+#+begin_src lisp
+  (loop for loop-variable in <una lista>
+        do (acción)
+  )
+
+#+end_src
+
+*** Ejemplos
+
+Ejemplo 1.
+
+Veamos el siguiente código:
+
+#+BEGIN_SRC lisp
+  (loop for x in '(pedro juan antonio)
+        do (format t " ~s" x))
+#+END_SRC
+
+Al ejecutarlo nos devolverá:
+
+#+BEGIN_SRC lisp
+PEDRO JUAN ANTONIO
+#+END_SRC
+
+Ejemplo 2. 
+
+Escribamos el siguiente código:
+
+#+BEGIN_SRC lisp
+  (loop for a from 10 to 20
+        do (print a)
+        )
+#+END_SRC
+
+Lo que nos dará como resultado:
+
+#+BEGIN_SRC lisp
+10 
+11 
+12 
+13 
+14 
+15 
+16 
+17 
+18 
+19 
+20 
+#+END_SRC
+
+Ejemplo 3.
+
+
+El siguiente código:
+
+#+BEGIN_SRC lisp
+  (loop for x from 1 to 20
+        if(evenp x)
+          do (print x)
+        )
+#+END_SRC
+
+Nos dará el resultado siguiente:
+
+#+BEGIN_SRC lisp
+2 
+4 
+6 
+8 
+10 
+12 
+14 
+16 
+18 
+20
+#+END_SRC
+
+** El constructor Do
+
+El constructor *do* es también usado para implementar iteraciones usando Lisp. 
+
+Su sintaxis básica es:
+
+#+BEGIN_SRC lisp
+  (do ((variable1  valor1  valor-actualizado1)
+       (variable2 valor2 valor-actualizado2)
+       ...)
+      (test valor-de-retorno)
+    (s-expresión))
+#+END_SRC
+
+El valor inicial de cada variable es evaluado y enlazado a su respectiva variable. El valor actualizado en cada clausula corresponde a una declaración de actualización opcional que especifica como el valor de la variable será actualizada en cada iteración . 
+
+Después de cada iteración, el test es evaluado y si devuelve un valor no-nil o true, el valor de retorno será evaluado y devuelto. 
+
+La última s-expresión es opcional. Si está presente será ejecutada después de cada iteración hasta que se devuelva el valor true. 
+
+*** Ejemplos
+
+Vamos a crear un fichero llamado principal .lisp con el siguiente código:
+
+#+BEGIN_SRC lisp
+  (do ((x 0 (+ 2 x))
+       (y 20 (- y 2)))
+      ((= x y)(- x y))
+    (format t "~% x = ~d y = ~d" x y)
+    )
+#+END_SRC
+
+Ejecutando ese código tendremos el siguiente resultado:
+
+#+BEGIN_SRC lisp
+x = 0  y = 20
+x = 2  y = 18
+x = 4  y = 16
+x = 6  y = 14
+x = 8  y = 12
+#+END_SRC
+
+** El constructor Dotimes
+
+El constructor dotimes nos permite hacer bucles con un número fijo de iteraciones. 
+
+Por ejemplo, vamos a ver el siguiente código. 
+
+#+BEGIN_SRC lisp
+  (dotimes (n 11)
+    (print n) (prin1 (* n n))
+    )
+#+END_SRC
+
+Cuyo resultado será:
+
+#+BEGIN_SRC lisp
+0 0
+1 1
+2 4
+3 9
+4 16
+5 25
+6 36
+7 49
+8 64
+9 81
+10 100
+#+END_SRC
+
+** El constructor Dolist
+
+El constructor dolist nos permitirá hacer iteraciones con cada uno de los elementos de una lista.
+
+Por ejemplo, si ejecutamos el siguiente código:
+
+#+BEGIN_SRC lisp
+  (dolist (n '(1 2 3 4 5 6 7 8 9))
+    (format t "~% Número: ~d Raíz: ~d" n (* n n))
+    )
+#+END_SRC
+
+Nos dará como resultado:
+
+#+BEGIN_SRC lisp
+Número: 1 Raíz: 1
+Número: 2 Raíz: 4
+Número: 3 Raíz: 9
+Número: 4 Raíz: 16
+Número: 5 Raíz: 25
+Número: 6 Raíz: 36
+Número: 7 Raíz: 49
+Número: 8 Raíz: 64
+Número: 9 Raíz: 81
+#+END_SRC
+
+
+
+** Saliendo con gracia de un bloque
+
+Las funciones *block* y *return-from* nos permiten salir de una forma elegante de un bloque anidado en caso de error. 
+
+La función *block* nos permite crear un bloque con un cuerpo con cero o más declaraciones. La sintaxis es:
+
+#+BEGIN_SRC lisp
+(block nombre-del-blocke(
+                         ...
+                         ...
+                         ))
+#+END_SRC
+
+La función *return-from* toma el nombre del bloque y un valor opcional de retorno (por defecto será nil)
+
+Vamos a ver esto como funciona en el siguiente ejemplo:
+
+#+BEGIN_SRC lisp
+(defun funcion-demo (señal)
+  (print 'saliendo-del-bloque)
+
+  (block fuera-del-bloque
+          (print 'entrando-en-el-bloque)
+          (print (block dentro-del-bloque
+
+                   (if señal
+                       (return-from fuera-del-bloque 3)
+                       (return-from dentro-del-bloque 5)
+                       )
+                   (print 'Esto-no-sera-escrito))
+                 )
+          (print 'dejando-el-bloque)
+          (print 'dejando-las-afueras-del-bloque)
+          t)
+  )
+
+(funcion-demo t)
+(terpri)
+(funcion-demo nil)
+
+#+END_SRC
+
+Esto nos dará como resultado:
+
+#+BEGIN_SRC lisp
+SALIENDO-DEL-BLOQUE 
+ENTRANDO-EN-EL-BLOQUE 
+5 
+DEJANDO-EL-BLOQUE 
+DEJANDO-FUERA-DEL-BLOQUE 
+; compiling (FUNCION-DEMO NIL)
+SALIENDO-DEL-BLOQUE 
+ENTRANDO-EN-EL-BLOQUE 
+5 
+DEJANDO-EL-BLOQUE 
+DEJANDO-FUERA-DEL-BLOQUE
+#+END_SRC
+
+* Funciones en Lisp
+
+Una función es un grupo de declaraciones que juntas implementan una tarea.
+
+Podemos dividir nuestro código en funciones separadas. La forma de dividir nuestro código depende de nosotros, pero lógicamente lo normal es dividir el código en funciones que implementan tareas específicas.
+
+** Definiendo funciones en Lisp
+
+La macro llamada *defun* es usada para definir funciones. Esta macro necesita tres argumentos:
+
+1. Nombre de la función
+2. Parámetros de la función
+3. Cuerpo de la función
+
+La sintaxis es la siguiente:
+
+#+BEGIN_SRC lisp
+(defun nombre (lista-parámetros) "Documentación -opcional-" cuerpo)
+#+END_SRC
+
+Ilustraremos esto con varios ejemplos simples.
+
+*** Ejemplos
+
+Ejemplo 1. 
+
+Vamos a escribir una función que calcula la media de cuatro números.
+
+#+BEGIN_SRC lisp
+(defun media-numeros (n1 n2 n3 n4)
+  (/ (+ n1 n2 n3 n4) 4)
+  )
+#+END_SRC
+
+Ejemplo 2.
+
+Ahora vamos a definir y llamar a una función que calculará el área de un círculo dado el radio como argumento.
+
+#+BEGIN_SRC lisp
+(defun area-circulo(radio)
+"Calcula el área de un círculo dado el radio"
+(terpri)
+(format t "Radio: ~5f" radio)
+(format t "~%Area: ~10f" (* 3.141592 radio radio))
+)
+(area-circulo 10)
+#+END_SRC
+
+El resultado será: 
+
+#+BEGIN_SRC lisp
+Radio:  10.0
+Area:   314.1592
+NIL
+#+END_SRC
+
+Podemos observar varias cosas:
+
++ Podemos poner una lista vacía como parámetro, lo cual significa que la función no toma argumentos.
++ Lisp también permite argumentos opcionales, múltiples y palabras clave.
++ La documentación dentro de la función describe el propósito de ésta. Está asociada con el nombre de la función y podemos obtener esa información con la función *documentation*
++ El cuerpo de la función puede consistir en un número de expresiones Lisp
++ El valor de la última expresión en el cuerpo es devuelto como el valor de la función
++ También podemos hacer que se devuelva un valor de la función usando el operador especial *return-from*
+
+
+A continuación se verán los distintos conceptos.
+
+** Parámetros opcionales
+
+Podemos definir una función con parámetros opcionales. Para hacer esto debemos poner el símbolo *&optional* antes de los nombres de los parámetros opcionales.
+
+*** Ejemplo
+#+begin_src lisp
+
+    (defun muestra-miembros (a b &optional c d)
+      (write (list a b c d)))
+  (terpri)
+  (muestra-miembros 'a 'b 'c 'd)
+  (terpri)
+  (muestra-miembros 'a 'b)
+  (terpri)
+  (muestra-miembros 1 2 3 4)
+
+#+end_src
+
+Esto nos dará como resultado:
+
+#+BEGIN_SRC lisp
+(1 2 3 NIL)
+(A B C D)
+(A B NIL NIL)
+(1 2 3 4)
+#+END_SRC
+
+** Parámetros Rest
+
+Algunas funciones necesitan tomar un número de variables como argumentos.
+
+Por ejemplo, la función *format* requiere de dos argumentos. Sin embargo, después de la cadena, se necesita un número de variables que depende del número de valores que se quieren mostrar. 
+
+De manera similar, la función *+* toma un número variable de argumentos. 
+
+Nosotros podemos añadir a nuestra función la capacidad de tener un número variable de parámetros usando el símbolo *&rest* 
+
+Veamos el siguiente ejemplo: 
+
+#+BEGIN_SRC lisp
+  (defun mostrar-miembros (a b &rest valores) (write (list a b valores)))
+  (mostrar-miembros 1 2 3)
+  (terpri)
+  (mostrar-miembros 'a 'b 'c 'd)
+  (terpri)
+  (mostrar-miembros 'a 'b)
+  (terpri)
+  (mostrar-miembros 1 2 3 4)
+  (terpri)
+  (mostrar miembros 1 2 3 4 5 6 7 8 9)
+#+END_SRC
+
+El resultado será: 
+
+#+BEGIN_SRC lisp
+  (1 2 (3))
+  (A B (C D))
+  (A B NIL)
+  (1 2 (3 4))
+  (1 2 (3 4 5 6 7 8 9))
+#+END_SRC
+
+** Palabras clave
+
+Los parámetros clave permiten especificar que valor va con un determinado parámetro. Lo indicamos con el símbolo *&key*.
+
+Cuando enviamos el valor a la función, debemos preceder el valor con *:nombre-del-parámetro* 
+
+El siguiente ejemplo lo ilustra:
+
+#+BEGIN_SRC lisp
+  (defun mostrar-miembros (&key a b c d) (write (list a b c d)))
+  (mostrar-miembros :a 1 :c 2 :d 3)
+  (terpri)
+  (mostrar-miembros :a 'p :b 'q :c 'r :d 's)
+  (terpri)
+  (mostrar-miembros :a 'p :d 'q)
+  (terpri)
+  (mostrar-miembros :a 1 :b 2)
+#+END_SRC  
+
+Cuando ejecutamos el código el resultado será:
+
+#+begin_src lisp
+  (1 NIL 2 3)
+  (P Q R S)
+  (P NIL NIL Q)
+  (1 2 NIL NIL)
+#+end_src
+
+** Devolviendo valores de una función
+
+Por defecto, una función en Lisp devuelve el valor de la última expresión evaluada como el valor de retorno. Veamos el siguiente ejemplo: 
+
+#+BEGIN_SRC lisp
+    (defun añadir-todo(a b c d)
+      (+ a b c d)
+  )
+  (setq suma (añadir-todo 10 20 30 40))
+  (write suma)
+  (terpri)
+  (write (añadir-todo 23.4 56.7 34.9 10.0))
+#+END_SRC
+
+
+Cuando ejecutamos esto, el resultado es:
+
+#+BEGIN_SRC lisp
+  100
+  125.0
+#+END_SRC
+
+Sin embargo, nosotros podemos usar el operador especial *return-from* para devolver inmediatamente cualquier valor de la función. 
+
+Ejemplo:
+
+#+BEGIN_SRC lisp
+  (defun mi-funcion (numero)
+    (return-form mi-funcion)
+    numero
+    )
+  (write (mi-funcion 20))
+#+END_SRC
+
+Cuando lo ejecutamos obtendremos:
+
+#+begin_src lisp
+10
+#+end_src
+
+** Funciones Lambda
+
+A veces podemos necesitar un función solo en un lugar del programa y además la función es tan trivial que no queremos darle un nombre o puede que no queramos que se guarde en la tabla de símbolos, así puede que nosotros queramos escribir una función sin nombre o *función anónima*. 
+
+Lisp permite escribir funciones anónimas que será evaluadas cuando se encuentren en el programa. Esas funciones son llamadas *funciones lambda* 
+
+La sintaxis de la función lambda es la siguiente: 
+
+#+begin_src lisp
+(lambda (parámetros) cuerpo)
+#+end_src
+
+Una función lambda no podrá ser evaluada si no aparece solo donde Lisp espera encontrar una función.
+
+Ejemplo:
+
+#+BEGIN_SRC lisp
+    (write ((lambda (a b c x)
+              (+ (* a (* x x)) (* b x) c))
+            4 2 9 3)
+            )
+#+END_SRC
+
+El resultado será: 
+
+#+begin_src lisp
+51
+#+end_src
+
+** Funciones mapeadoras
+
+Las funciones mapeadoras (mapping) son un grupo de funciones que pueden ser aplicadas sucesivamente a una o más listas de elementos. El resultado de aplicar esas funciones a una lista nos dará como resultado un nueva lista.
+
+Por ejemplo, la función *mapcar* procesa sucesivos elementos de una o más listas.
+
+El primer argumento de la función mapcar deberá ser una función y el resto de argumentos son la lista o listas a las cuales la función será aplicada. 
+
+Los argumentos de la función son aplicados a los elementos de la lista de forma sucesiva y se construirá una nueva lista. Si los argumentos de la lista no son iguales en longitud, entonces el proceso de mapeo se detendrá al final de la lista más corta. La lista resultante tendrá el mismo número de elementos que la lista más corta. 
+
+
+*** Ejemplos
+
+Ejemplo 1. 
+
+Vamos a empezar con un ejemplo simple en el cual añadiremos un 1 a los elementos de una lista. 
+
+#+BEGIN_SRC lisp
+(write (mapcar '1+ '(23 34 45 56 67 78 89)))
+#+END_SRC
+
+Al ejecutar el código obtendremos como resultado:
+
+#+BEGIN_SRC lisp
+(24 35 46 57 68 79 90)
+#+END_SRC
+
+Ejemplo 2. 
+
+Ahora crearemos una función que elevará al cubo a los elementos de una lista. Para ello usaremos una función lambda.
+
+#+BEGIN_SRC lisp
+(defun al-cubo(lista)
+(mapcar #'(lambda(x) (* x x x)) lista)
+)
+(write (al-cubo '(2 3 4 5 6 7 8 9)))
+#+END_SRC
+
+El código anterior nos dará como resultado:
+
+#+begin_src lisp
+
+(8 27 64 125 216 343 512 729)
+
+#+end_src
+
+Ejemplo 3. 
+
+Veamos el siguiente código:
+
+#+BEGIN_SRC lisp
+(write (mapcar '+ '(1 3 5 7 9 11 13) '(2 4 6 8)))
+#+END_SRC
+
+El resultado será:
+
+#+BEGIN_SRC lisp
+(3 7 11 15)
+#+END_SRC
+
+* Predicados en Lisp
+
+Los predicados son funciones que testean sus argumentos con alguna específica condición y nos devuelve un *nil* si la condición es falsa un valor no-nil si la condición es verdadera. Aunque no es una norma absoluta la mayoría de las funciones predicado su nombre termina en p, tales como evenp, oddp, zerop, etc. Esto no ocurre con las funciones predicados más antiguas como atom, equal, eq, etc, ya que aún no existía esa norma. Las más modernas sí suelen seguir esa regla. 
+
+En la siguiente tabla tenemos un resumen de los predicados más usados:
+
+| Predicado  | Descripción                                                                                                                                           |
+|------------+-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| atom       | Comprueba si el argumento es un átomo                                                                                                                 |
+| equal      | Comprueba si una estructura es igual a otra                                                                                                           |
+| eq         | Comprueba si dos objetos son idénticos y comparten la misma localización de memoria                                                                   |
+| eql        | Comprueba dos objetos y devuelve true si son equivalentes, o si son dos números del mismo tipo o si son caracteres que representen al mismo carácter. |
+| evenp      | Comprueba si un número es un número par                                                                                                               |
+| oddp       | Comprueba si un número es un número impar                                                                                                             |
+| zerop      | Comprueba si un número es cero                                                                                                                        |
+| null       | Comprueba si un argumento evalúa a nil                                                                                                                |
+| listp      | Comprueba si un argumento es una lista                                                                                                                |
+| greaterp   | Toda dos número y comprueba si uno es mayor que el otro de izquierda a derecha                                                                        |
+| lessp      | Comprueba si dos números uno es menor que el otro de izquierda a derecha                                                                              |
+| numberp    | Comprueba si un argumento es un número                                                                                                                |
+| symbolp    | Comprueba si un argumento es un símbolo                                                                                                               |
+| integerp   | Comprueba si un argumento es un entero                                                                                                                |
+| rationalp  | Comprueba si un argumento es un número racional                                                                                                       |
+| floatp     | Comprueba si un número es un número con coma flotante                                                                                                 |
+| realp      | Comprueba si un número es un número real                                                                                                              |
+| complexp   | Comprueba si un número es un número complejo                                                                                                          |
+| characterp | Comprueba si un argumento es un carácter                                                                                                              |
+| stringp    | Comprueba si un argumento es una cadena de texto                                                                                                      |
+| arrayp     | Comprueba si un argumento es un array                                                                                                                 |
+| packagep   | Comprueba si un argumento es un paquete                                                                                                                           |
+
+** Ejemplos
+
+Ejemplo 1. 
+
+#+BEGIN_SRC lisp
+(write (atom 'abcd))
+(terpri)
+(write (equal 'a 'b))
+(terpri)
+(write (evenp 10))
+(terpri)
+(write (evenp 7 ))
+(terpri)
+(write (oddp 7 ))
+(terpri)
+(write (zerop 0.0000000001))
+(terpri)
+(write (eq 3 3.0 ))
+(terpri)
+(write (equal 3 3.0 ))
+(terpri)
+(write (null nil ))
+#+END_SRC
+
+Cuyo resultado nos dará:
+
+#+BEGIN_SRC lisp
+T
+NIL
+T
+NIL
+T
+NIL
+NIL
+NIL
+T
+#+END_SRC
+
+Ejemplo 2
+
+#+BEGIN_SRC lisp
+    (defun factorial (numero)
+      (cond ((zerop numero) 1)
+            (t (* numero (factorial (- numero 1))))
+            )
+      )
+  (setq n 6)
+  (format t "~% El factorial de ~d es: ~d" n (factorial n))
+#+END_SRC
+
+Cuyo resultado es: 
+
+#+BEGIN_SRC lisp
+El factorial de 6 es: 720
+#+END_SRC
+
+* Números en Lisp
+
+En Common Lisp hay definidos varios tipos de números. El tipo de dato *número* incluye varios tipos de de número soportados por Lisp. 
+
+Este tipo de números son:
+
++ Enteros
++ Racionales
++ Números con coma flotante
++ Números complejos
+
+En este diagrama se resumen bien y además su jerarquía:
+
+[[./img/tipos-de-numeros.jpg]]
+
+
+** Tipos de números en Lisp
+
+En la siguiente tabla describiremos los distintos tipos de números soportados por Lisp:
+
+| Tipo de Dato | Descripción                                                                                              |
+| fixnum       | Representa a números enteros no muy grandes. Entre un grango de -215 y 215                               |
+| bignum       | Números muy grandes con la memoria limitada.                                                             |
+| ratio        | Representa la relación de dos números, numerador y denominador                                           |
+| float        | Representa números no enteros. Hay 4 tipos con precisión creciente                                       |
+| complex      | Representa números complejos. La parte real e imaginaria upde ser racional o flotante. Se indican con #c |  
+
+*** Ejemplos
+
+#+begin_src lisp
+(write (/ 1 2))
+(terpri)
+(write (+ (/ 1 2) (/ 3 4)))
+(terpri)
+(write (+ #c( 1 2) #c (3 -4)))
+
+#+end_src
+
+Cuyo resultado será:
+
+#+BEGIN_SRC lisp
+1/2
+5/4
+#C(4 -2)
+#+END_SRC
+
+** Funciones numéricas
+
+La siguiente tabla describe algunas de las funciones numéricas más usadas.
+
+| Función                          | Descripción                                                     |
+| +,-,*,/                          | Operaciones aritméticas                                         |
+| sin,cos,tan,acos,asin,atan       | Funciones trigonométricas                                       |
+| sinh,cosh,tanh,acosh,asinh,atanh | Funciones hiperbólicas                                          |
+| exp                              | Potenciación                                                    |
+| expt                             | Potenciación.                                                   |
+| log                              | Función logarítmica. Logaritmo natural                          |
+| conjugate                        | Calcula la conjugación compleja de un número.                   |
+| abs                              | Devuelve el valor absoluto                                      |
+| gcd                              | Calcula el mayor común divisor de unos números dados            |
+| lcm                              | Calcula el común multiplicador de unos números dados            |
+| isqrt                            | Nos da el mayor entero menor o igual a su raíz cuadrada         |
+| floor,ceiling,truncate,round     | Toma dos argumentos como números y nos devuelve un cociente     |
+| ffloor,fceiling,ftruncate,fround | Igual que el anterior pero devuelve un número con como flotante |
+| mod, rem                         | Devuelve el resto de una división                               |
+| numerator, denominator           | Devuelve las respectivas partes de una fracción                 |
+| realpart, imagpart               | Devuelve la parte imaginaria y real de un número complejo       |
+
+
+*** Ejemplos
+    
+
+#+BEGIN_SRC lisp
+(write (/ 45 78))
+(terpri)
+(write (floor 45 78))
+(terpri)
+(write (/ 3456 75))
+(terpri)
+(write (floor 3456 75))
+(terpri)
+(write (ceiling 3456 75))
+(terpri)
+(write (truncate 3456 75))
+(terpri)
+(write (round 3456 75))
+(terpri)
+(write (ffloor 3456 75))
+(terpri)
+(write (fceiling 3456 75))
+(terpri)
+(write (ftruncate 3456 75))
+(terpri)
+(write (fround 3456 75))
+(terpri)
+(write (mod 3456 75))
+(terpri)
+(setq c (complex 6 7))
+(write c)
+(terpri)
+(write (complex 5 -9))
+(terpri)
+(write (realpart c))
+(terpri)
+(write (imagpart c))
+#+END_SRC
+
+Cuyo resultado será:
+
+#+BEGIN_SRC lisp
+15/26
+0
+1152/25
+46
+47
+46
+46
+46.0
+47.0
+46.0
+46.0
+6
+#C(6 7)
+#C(5 -9)
+6
+7
+#+END_SRC
+
+* Caracteres en Lisp
+
+En Lisp, los caracteres son representados como objetos de datos de tipo *carácter* 
+
+Podemos observar que un objeto carácter precedido por un #\ es el carácter en sí mismo. Por ejemplo #\a es el carácter a. 
+
+El espacio y otros caracteres especiales son indicados precediendo #\ antes del nombre de carácter. Por ejemplo, #\SPACE representa el carácter del espacio.
+
+Veamos el siguiente ejemplo:
+
+#+BEGIN_SRC lisp
+(write 'a)
+(terpri)
+(write #\a)
+(terpri)
+(write-char #\a)
+(terpri)
+(write-char 'a)
+#+END_SRC
+
+El resultado será:
+
+#+begin_src lisp
+A
+#\a 
+a 
+**\* - WRITE-CHAR: argument A is not a character 
+
+#+end_src
+
+** Caracteres especiales
+
+Common Lisp permite usar los siguientes caracteres especiales. Ellos son llamados caracteres semi-estándar. 
+
++ #\Backspace 
++ #\Tab
++ #\Linefeed
++ #\Page
++ #\Return
++ #\Rubout
+
+
+** Funciones de comparación para caracteres
+
+Las funciones de comparación numéricos  y para  operadores como < y > no funcionan con caracteres. Common Lisp nos proporciona otros dos grupos de funciones para comprar caracteres en nuestro código.
+
+Uno de ellos es sensible a mayúsculas y minúsculas (case-sensitive) y el otro no (case-insensitive)
+
+Veamos la siguiente tabla: 
+
+| Funciones case-sensitive | Funciones case-insensitive | Descripción                                           |
+|--------------------------+----------------------------+-------------------------------------------------------|
+| char=                    | char-equal                 | Comprueba si dos valores son iguales o no.            |
+| char/=                   | char-not-equal             | Comprueba si dos valores son diferentes o no          |
+| char&#60;                | char-lessp                 | Comprueba si un valor es menor que el otro            |
+| char>                    | char-greaterp              | Comprueba si el valor izquierdo  es mayor que el otro |
+| char&#60;=               | char-not-greaterp          | Comprueba si el valor izquierdo es mayor o igual      |
+| char>=                   | char-not-lessp             | Comprueba si el valor izquierdo es menor o igual      |
+
+** Ejemplo
+
+Veamos el siguiente código 
+
+#+BEGIN_SRC lisp
+; comparación con funciones que discriminan entre mayúsculas y minúsculas
+(write (char= #\a #\b))
+(terpri)
+(write (char= #\a #\a))
+(terpri)
+(write (char= #\a #\A))
+(terpri)
+
+; comparación con funciones que no discriminan entre mayúsculas y minúsculas
+(write (char-equal #\a #\A))
+(terpri)
+(write (char-equal #\a #\b))
+(terpri)
+(write (cahr-lessp #\a #\b #\c))
+(terpri)
+(write (char-greaterp #\a #\b #\c))
+#+END_SRC
+
+El resultado de ejecutar el código será:
+
+#+BEGIN_SRC lisp
+NIL
+T
+NIL
+T
+NIL
+T
+NIL
+#+END_SRC
+
+* Arrays en Lisp
+
+En Lisp se puede definir un uni o múltiple dimensional array usando la función *make-array*. Un array puede guardar cualquier objeto de Lisp como elemento.
+
+Un array consiste en un lugar de memoria contiguo. La dirección menor corresponde al primer elemento y la dirección mayor corresponde al último elemento. 
+
+El número de dimensiones de un array es llamado su *rango*. 
+
+En Lisp, un elemento array es especificado por una secuencia de índices numéricos enteros no negativos. La longitud de la secuencia debe ser igual al rango del array. El indexado comienza por 0. 
+
+Por ejemplo, para crear un array de 10 celdas, llamado mi-array, escribiremos:
+
+#+BEGIN_SRC lisp
+(setf mi-array (make-array '(10)))
+#+END_SRC
+
+La función *aref* nos permite acceder al contenido de cada celda. Éste toma dos arguentos, el nombre del array el valor del índice. 
+
+Por ejemplo para acceder al índice 9:
+
+#+BEGIN_SRC lisp
+
+(aref mi-array 9)
+#+END_SRC
+
+** Ejemplos
+
+Ejemplo 1 
+
+Veamos el siguiente código:
+
+#+BEGIN_SRC lisp
+(write (setf mi-array (make-array '(10))))
+(terpri)
+(setf (aref mi-array 0) 25)
+(setf (aref mi-array 1) 23)
+(setf (aref mi-array 2) 45)
+(setf (aref mi-array 3) 10)
+(setf (aref mi-array 4) 20)
+(setf (aref mi-array 5) 17)
+(setf (aref mi-array 6) 25)
+(setf (aref mi-array 7) 19)
+(setf (aref mi-array 8) 67)
+(setf (aref mi-array 9) 30)
+(write mi-array)
+#+END_SRC
+
+Cuando ejecutamos el código obtendremos como resultado:
+
+#+BEGIN_SRC lisp
+#(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)
+#(25 23 45 10 20 17 25 19 67 30)
+#+END_SRC
+
+Ejemplo 2. 
+
+Vamos a crear un array de 3 por 3.
+
+#+begin_src lisp
+  (setf x (make-array '(3 3)
+                      :initial-content '((0 1 2) (3 4 5) (6 7 8)))
+        )
+  (write x)
+
+#+end_src
+
+El resultado será:
+
+#+BEGIN_SRC lisp
+#2A((0 1 2) (3 4 5) (6 7 8))
+#+END_SRC
+
+Ejemplo 3
+
+Veamos el siguiente código:
+
+#+BEGIN_SRC lisp
+  (setq a (make-array '(4 3)))
+  (dotimes (i 4)
+    (dotimes (j 3)
+      (setf (aref a i j) (list i 'x j '= (* i j)))
+      )
+    )
+  (dotimes (i 4)
+    (dotimes (j 3)
+      (print (aref a i j))
+      )
+    )
+#+END_SRC
+
+El resultado es:
+
+#+BEGIN_SRC lisp
+(0 X 0 = 0) 
+(0 X 1 = 0) 
+(0 X 2 = 0) 
+(1 X 0 = 0) 
+(1 X 1 = 1) 
+(1 X 2 = 2) 
+(2 X 0 = 0) 
+(2 X 1 = 2) 
+(2 X 2 = 4) 
+(3 X 0 = 0) 
+(3 X 1 = 3) 
+(3 X 2 = 6)
+#+END_SRC
+
+** Sintaxis completa para la función make-array
+
+La función make-array tiene muchos otros argumentos. En la siguiente tabla veremos algunos de ellos.
+
+| Argumentos              | Descripción                                                                                                     |
+| dimensions              | Da las dimensiones del array. Un número para un array uni-dimensional y un lista para uno multi-dimensional     |
+| :element-type           | Especifica el tipo por defecto. Por defecto este valor es T , es decir, cualquier tipo                          |
+| :initial-element        | Valor del elemento inicial. Esto creará un array con todos los elementos inicializados a un valor en particular |
+| :initial-content        | Contenido inicial como objeto                                                                                   |
+| :adjustable             | Ayuda a crear un vector ajustable. El valor es un booleano                                                      |
+| :fill-pointer           | Mantiene un conjunto de elementos guardados en un vector que se puede redimensionar                             |
+| :displaced-to           |                                                                                                                 |
+| :displaced-index-offset |                                                                                                                 |
+|                         |                                                                                                                 |
+
+
+Ejemplo 4. 
+
+Vamos a crear el siguiente código:
+
+#+BEGIN_SRC lisp
+  (setq miarray (make-array '(3 2 3)
+                            :initial-contents
+                            '(((a b c) (1 2 3))
+                              ((d e f) (4 5 6))
+                              ((g h i) (7 8 9))
+                              ))
+        )
+  (setq array2 (make-array 4 :displaced-to miarray :displaced-index-offset 2))
+  (write miarray)
+  (terpri)
+  (write array2)
+#+END_SRC
+
+El resultado de ejecutar este código es:
+
+#+BEGIN_SRC lisp
+#3A(((A B C) (1 2 3)) ((D E F) (4 5 6)) ((G H I) (7 8 9)))
+#(C 1 2 3)
+#+END_SRC
+
+* Cadenas de texto
+
+En Common Lisp las cadenas de texto son vectores, es decir, arrays unidimensionales de caracteres. 
+
+Las cadenas de texto literales están encerradas entre dobles comillas. Cualquier carácter pude ser encerrado entre comillas dobles para hacer una cadena de texto, excepto el carácter de doble comilla (") y el carácter de escape contra barra (\). Sin embargo, podemos añadir esos caracteres usando el método de escape.
+
+Ejemplo.
+
+Veamos el siguiente código:
+
+#+BEGIN_SRC lisp
+(write-line "Hola Mundo")
+(write-line "Bienvenido a Mi mundo)
+;; escando las dobles comillas
+(write-line "Bienvenido a \"Mi Mundo\"")
+#+END_SRC
+
+Cuando ejecutamos este código obtenemos el siguiente resultado:
+
+#+BEGIN_SRC lisp
+Hola Mundo
+Bienvenido a Mi mundo
+Bienvenido a "Mi Mundo"
+#+END_SRC
+
+** Funciones de comparación de cadenas de texto
+
+Las funciones y operadores de comparación numéricos, como < y > no funcionan con las cadenas de texto. Common Lisp proporciona otros dos conjuntos de funciones para comparar cadenas de texto. Un conjunto es case-sensitivo y el otro no. 
+
+La siguiente tabla proporciona las funciones --
+
+| Funciones Case-sensitivo | Funciones Case-insensitivo | Descripción                                                                              |
+|--------------------------+----------------------------+------------------------------------------------------------------------------------------|
+| string=                  | string-equal               | Comprueba si los valores de los operadores son iguales o no. Devuelve true si es así     |
+| string/=                 | string-not-equal           | Comprueba si los valores de los operadores son diferentes o no. Devuelve true si es así  |
+| string<                  | string-lessp               | Comprueba si los valores de los operadores están monotónicamente decreciendo.            |
+| string>                  | string-greaterp            | Comprueba si los valores de los operadores están monotónicamente creciendo.              |
+| string<=                 | string-not-greaterp        | Comprueba si el valor del operador de la izquierda es mayor o igual que el de la derecha |
+| string>=                 | string-not-lessp           | Comprueba si el valor del operador de la izquierda es menor o igual que el de la derecha |
+
+**** Demostración 
+
+#+BEGIN_SRC lisp
+; comparación case-sensitiva
+(write (string= "esto es una prueba" "Esto es una prueba"))
+(terpri)
+(write (string> "esto es una prueba" "Esto es una prueba"))
+(terpri)
+(write (string< "esto es una prueba" "Esto es una prueba"))
+(terpri)
+
+
+; comparación case-insentiva 
+(write (string-equal "esto es una prueba" "Esto es una prueba"))
+(terpri)
+(write (string-greaterp "esto es una prueba" "Esto es una prueba"))
+(terpri)
+(write (string-lessp "esto es una prueba" "Esto es una prueba"))
+(terpri)
+
+; comprobando la no igualdad
+(write (string/= "esto es una prueba" "esto es una Prueba"))
+(terpri)
+(write (string-not-equal "esto es una prueba" "Esto es una prueba"))
+(terpri)
+(write (string/= "lisp" "lisping"))
+(terpri)
+(write (string/= "decente" "decencia"))
+#+END_SRC
+
+#+RESULTS:
+: 5
+
+Y el resultado dará:
+
+#+BEGIN_SRC lisp
+NIL
+0
+NIL
+T
+NIL
+NIL
+
+T
+NIL
+NIL
+
+12
+NIL
+4
+5
+
+
+#+END_SRC
+
+
+
+
+
+** Funciones de control
+
+La siguiente tabla describe las funciones de control
+
+| Sr.No | Función           | Descripción                                      |
+|-------+-------------------+--------------------------------------------------|
+|     1 | string-upcase     | Convierte la cadena de texto en mayúsculas       |
+|     2 | string-downcase   | Convierte la cadena de texto en minúsculas       |
+|     3 | string-capitalize | Pone en cursiva cada letra de la cadena de texto |
+
+Ejemplo:
+
+#+BEGIN_SRC lisp
+  (write-line (string-upcase " Saludos a todos los lispers"))
+  (terpri)
+  (write-line (string-capitalize "Saludos a todos los lispers"))
+#+END_SRC
+
+#+RESULTS:
+: Saludos A Todos Los Lispers
+
+Y cuyo resultado será:
+
+#+BEGIN_SRC lisp
+
+SALUDOS A TODOS LOS LISPERS
+
+Saludos A Todos Los Lispers
+
+#+END_SRC
+
+
+
+** Funciones para decorar las cadenas de texto 
+
+La siguiente tabla describe las funciones para adornar a las cadenas de texto. 
+
+| Sr.No | Función           | Descripción                                                                                                                                                               |
+|-------+-------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|       |                   | <120>                                                                                                                                                                     |
+|     1 | string-trim       | Toma una cadena como primer argumento y otra como segundo argumento y devuelve una nueva cadena donde ha borrado los caracteres de la primera cadena  a la segunda        |
+|     2 | String-lef-trim   | Toma una cadena como primer argumento y otra cadena como segundo y devuelve una subcadena donde borra los caractéres de la primera cadena a la segunda desde el principio |
+|     3 | String-right-trim | Toma una cadena como primer argumento y otra cadena como segundo y devuelve una subcadena donde borra los caractéres de la primera cadena a la segunda desde el final                                                                                                                                                                              |
+
+
+Ejemplo:
+
+#+BEGIN_SRC lisp
+(write-line (string-trim " " "  saludos a todos los lispers  "))
+(write-line (string-left-trim " " "  saludos a todos los lispers  "))
+(write-line (string-right-trim " " "  saludos a todos los lispers  "))
+(write-line (string-trim " a" "  saludos a todos los lispers  "))
+#+END_SRC
+
+#+RESULTS:
+: saludos a todos los lispers
+
+Esto devolverá lo siguiente:
+
+#+BEGIN_SRC lisp
+saludos a todos los lispers
+saludos a todos los lispers  
+  saludos a todos los lispers
+saludos a todos los lispers
+#+END_SRC
+
+** Otras funciones para las cadenas de texto
+
+En Lisp las cadenas de texto son arrays y también secuencias. Ya hemos cubierto ese tipo de datos en otras partes del tutorial. Todas las funciones que son aplicables a los arrays y a las secuencias también lo son a las cadenas de texto. Sin embargo, demostraremos que hay unas funciones más comúnmente usadas explicándolas en varios ejemplos. 
+
+*** Calculando la longitud 
+
+La función *length* calcula la longitud de una cadena de texto. 
+
+
+*** Extrayendo subcadenas 
+
+La función *subseq* devuelve una subcadena (tal como una cadena de texto es también una secuencia) empezando en un punto en particular y terminando en un índice en particular o en el final de la cadena.
+
+*** Accediendo a un carácter dentro de la cadena 
+
+La función *char* nos permite acceder a un carácter en particular dentro de la cadena de texto. 
+
+*** Ejemplos
+
+#+BEGIN_SRC lisp
+(write (length "Hola Mundo"))
+(terpri)
+(write-line (subseq "Hola Mundo" 6))
+(write (char "Hola Mundo" 6))
+#+END_SRC
+
+Cuando ejecutamos el código el resultado es:
+
+#+BEGIN_SRC lisp
+10
+undo
+#\u
+#+END_SRC
+
+** Clasificación y unión de cadenas de texto
+
+La función *sort* permite clasificar una cadena de texto. Ésta toma una secuencia (vector o cadena) y dos argumentos como predicado y devuelve una versión ordenada de la secuencia. 
+
+La función *merge* toma dos secuencias y un predicado y devuelve una función producto de la unión de las dos secuencias, acordado por el predicado. 
+
+Ejemplo:
+
+#+BEGIN_SRC lisp
+; ordenando las cadenas
+(write (sort (vector "Amal" "Akbar" "Antonio") #'string<))
+(terpri)
+#+END_SRC
+Y como resultado: 
+
+#+BEGIN_SRC lisp
+("Akbar" "Amal" "Antonio")
+#+END_SRC
+
+#+BEGIN_SRC lisp
+; uniendo cadenas
+(write (merge 'vector (vector "Rishi" "Zara" "Priyanka")
+(vector "Anju" "Anuj" "Avni" 
+
+
+
+)))
+#+END_SRC
+
+*** Invirtiendo cadenas de texto
+
+La función *reverse* invierte una cadena de texto. 
+
+Veamos un ejemplo
+
+#+BEGIN_SRC lisp
+(write-line (reverse "Lisp es el mejor lenguaje de programación del mundo"))
+#+END_SRC
+
+Cuando ejecutemos el código el resultado será:
+
+
+*** Concatenando cadenas de texto
+
+La función *concatenate* concatena dos cadenas de texto. Esto es una función genérica de las secuencias. 
+
+Por ejemplo, si escribimos el siguiente código:
+
+#+BEGIN_SRC lisp
+(write-line (concatenate 'Lis es el mejor, " "lenguaje de programación del mundo""))
+#+END_SRC
+
+Cuando ejecutemos el código el resultado será:
+
+* Secuencias 
+
+Las secuencias es un tipo de dato abstracto en Lisp. Los vectores y las listas son dos subtipos concretos de este tipo de dato. Todas las funcionalidades definidas en los datos tipo secuencia son aplicables a todos las listas y vectores. 
+
+En esta sección, discutiremos las funciones más comunes para secuencias. 
+
+Antes de empezar hay varios formas de manipular secuencias (es decir, vectores y listas) vamos a echar un vistazo a la lista de todas las funciones que tenemos.
+
+** Creando una secuencia 
+
+La función *make-sequence* permite crear una secuencia de cualquier tipo. La sintaxis para esta función es: 
+
+#+BEGIN_SRC lisp
+make-sequence sectipo  sectamaño &key :initial-element
+#+END_SRC
+
+Esto creará una secuencia del tipo y tamaño dicho.
+
+
+Podríamos opcionalmente especificar algunos valores usando el argumento :initial-element, entonces cada uno de los elementos será iniciado a este valor. 
+
+Por ejemplo, vamos a ver el siguiente ejemplo:
+
+#+BEGIN_SRC lisp
+(write (make-sequence '(vector float)
+10
+:initial-element 1.0))
+#+END_SRC
+
+Y dará como resultado: 
+
+| 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 |
+
+
+** Funciones genéricas para secuencias
+
+
+| Sr.No | Función     | Descripción                                                                                                                                                                                                         |
+|-------+-------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|       |             | <140>                                                                                                                                                                                                               |
+|     1 | elt         | Permite acceder a un elemento concreto siguiendo un índice                                                                                                                                                          |
+|     2 | length      | Devuelve la longitud de la secuencia                                                                                                                                                                                |
+|     3 | subseq      | Devuelve una subsecuencia empezando y terminando por un particular índice                                                                                                                                           |
+|     4 | copy-seq    | Devuelve una secuencia con los mismo elementos que su argumento                                                                                                                                                     |
+|     5 | fill        | Es usado para establecer multiples elementos de una secuencia a un único valor                                                                                                                                      |
+|     6 | replace     | Toma dos secuencias y copia reemplaza elementos de la primera secuencia en la segunda                                                                                                                               |
+|     7 | count       | Toma un elemento y una secuencia y devuelve las veces que ese elemento aparece en la secuencia                                                                                                                      |
+|     8 | reverse     | Devuelve los elementos de una secuencia en orden inverso                                                                                                                                                            |
+|     9 | nreverse    | Devuelve la misma secuencia con el orden invertido                                                                                                                                                                  |
+|    10 | concatenate | Devuelve una secuencia por concatenación de varias secuencias                                                                                                                                                       |
+|    11 | position    | Toma un elemento y nos devuelve en qué índice se haya                                                                                                                                                               |
+|    12 | find        | Toma un elemento y una secuencia y devuelve el elemento si es encontrado y sino nos devuelve nil                                                                                                                    |
+|    13 | sort        | Toma una secuencia y dos argumentos y devuelve una versión ordenada de la secuencia                                                                                                                                 |
+|    14 | merge       | Toma una secuencia y un predicado y devuelve una secuencia producto de la unión de las dos secuencias                                                                                                               |
+|    15 | map         | Toma una función de n argumentos y n secuencias y devuelve una nueva secuencia que contiene el resultado de aplicar la función a cada uno de los elemntos de las secuencias                                         |
+|    16 | some        | Toma un predicado como un argumento e interacciona sobre los argumentos de la secuencia y devuelve el primer valor no nulo por el predicado o devuelve falso si el predicado no es satisfecho.                      |
+|    17 | every       | Toma un predicado como un argumento e interaccional sobre los argumentos de la secuencia y termina devolviendo un falso tan pronto como el predicado falla. Si el predicado es satisfecho devuelve un verdadero     |
+|    18 | notany      | Toma un predicado como argumento e interacciona sobre los argumentos de la secuencia y devuelve falso tan pronto como el predicado es satisfecho o verdadero si no lo es.                                           |
+|    19 | notevery    | Tomo un predicado como un arguemento e interacciona sobre los arguemntos de la secuencia y devuelve verdadero tan pronto como el predicado falla o falso si el predicado es siempre satisfecho.                     |
+|    20 | reduce      | Mapea sobre una secuencia, aplicando una función de argumento doble priemro al primero de los dos elementos de la secuencia y entonces a el valor devuelto por la función y subsecuentes elementos de la secuencia. |
+|    21 | search      | Busca una secuencia a localizar uno o más elemntos que satisfagan alguna prueba                                                                                                                                     |
+|    22 | remove      | Toma un elemento y una secuencia y devuelve la secuencia con el elemento eliminado                                                                                                                                  |
+|    23 | delete      | También toma un elemento y una secuencia y devuelve una secuencia del mismo tipo como la secuencia del argumento que tiene el e mismo elemento excepto el elemento.                                                 |
+|    24 | substitute  | Toma un nuevo elemento y una secuencia y devuelve la misma secuencia pero sin el elemento                                                                                                                           |
+|    25 | nsubstitute | Coge un nuevo elemento y un elemento ya existente y una secuencia y devuelve la misma secuencia con instancia del elemento existente reemplazado con el nuevo                                                       |
+|    26 | mismatch    | Coge dos secuencias y devuelve el índice del primer par de elemenntos que no son coincidentes.                                                                                                                                       |
+
+
+** Funciones estándar para secuencias con argumentos clave 
+
+| Argumento | Significado                                                                                                               | Valor por defecto |
+|-----------+---------------------------------------------------------------------------------------------------------------------------+-------------------|
+| :test     | Función de dos argumentos usada para comparar elementos                                                                   | EQL               |
+| :key      | Función de un argumento que extra un valor clave de la secuencia de elementos. NIL significa que usa el elemento como tal | NIL               |
+| :start    | Empezando a indexar (inclusivamente) de una subsecuencia                                                                  | 0                 |
+| :end      | Finalizando el indexado (exclusivamente) de una subsecuencia. NIL indica fin de la secuencia                              | NIL               |
+| :from-end | Si es verdadero, la secuencia será atravesada en orden inverso, desde el final al principio                               | NIL               |
+| :count    | Número que indica el número de elementos a eliminar o sustituir o NIL que indica todos (ELIMINAR O SUSTITUIR solo)        | NIL               |
+
+
+Ahora solo hemos discutido varias funciones y palabras clave que son usadas como argumentos en esas funciones que trabajan sobre secuencias. En la próxima sección, veremos como usar esas funciones con ejemplos. 
+
+** Buscando, Longitudes y Elementos
+
+La función *length* devuelve la longitud de una secuencia, y la función *elt* nos permite acceder a elementos individuales usando un índice entero. 
+
+Ejemplo:
+
+#+BEGIN_SRC lisp
+(setq x (vector 'a 'b 'c 'd 'e))
+(write (length x))
+(terpri)
+(write (elt x 3))
+#+END_SRC
+
+
+#+RESULTS:
+El resultado será:
+: 5
+: D
+
+** Modificando secuencias 
+
+Algunas funciones para secuencias nos permiten interaccionar a través de la secuencia y realizar algunas operaciones como, búsquedas, eliminación, conteo o filtrado de elementos específicos sin necesidad de escribir bucles específicos. 
+
+El siguiente ejemplo explica esto:
+
+/Ejemplo 1/
+
+#+BEGIN_SRC lisp
+(write (count 7 '(1 5 6 7 8 9 2 7 3 4 5)))
+#+END_SRC
+
+#+RESULTS:
+: 2
+
+#+BEGIN_SRC lisp
+(write (remove 5 '(1 5 6 7 8 9 2 7 3 4 5)))
+#+END_SRC
+
+#+RESULTS:
+| 1 | 6 | 7 | 8 | 9 | 2 | 7 | 3 | 4 |
+
+#+BEGIN_SRC lisp
+(write (delete 5 '(1 5 6 7 8 9 2 7 3 4 5)))
+#+END_SRC
+
+#+RESULTS:
+| 1 | 6 | 7 | 8 | 9 | 2 | 7 | 3 | 4 |
+
+#+BEGIN_SRC lisp
+(write (substitute 10 7 '(1 5 6 7 8 9 2 7 3 4 5)))
+#+END_SRC
+
+#+RESULTS:
+| 1 | 5 | 6 | 10 | 8 | 9 | 2 | 10 | 3 | 4 | 5 |
+
+#+BEGIN_SRC lisp
+(write (find 7 '(1 5 6 7 8 9 2 7 3 4 5)))
+#+END_SRC
+
+#+RESULTS:
+: 7
+
+#+BEGIN_SRC lisp
+(write (position 5 '(1 5 6 7 8 9 2 7 3 4 5)))
+#+END_SRC
+
+#+RESULTS:
+: 1
+
+/Ejemplo 2/
+
+#+BEGIN_SRC lisp
+(write (delete-if #'oddp '(1 5 6 7 8 9 2 7 3 4 5)))
+#+END_SRC
+
+#+RESULTS:
+| 6 | 8 | 2 | 4 |
+
+#+BEGIN_SRC lisp
+(write (delete-if #'evenp '(1 5 6 7 8 9 2 7 3 4 5)))
+#+END_SRC
+
+#+RESULTS:
+| 1 | 5 | 7 | 9 | 7 | 3 | 5 |
+
+#+BEGIN_SRC lisp
+(write (remove-if #'evenp '(1 5 6 7 8 9 2 7 3 4 5)))
+#+END_SRC
+
+#+RESULTS:
+| 1 | 5 | 7 | 9 | 7 | 3 | 5 |
+
+#+BEGIN_SRC lisp
+(setq x (vector 'a 'b 'c 'd 'e 'f 'g))
+(fill x 'p :start 1 :end 4)
+#+END_SRC
+
+#+RESULTS:
+| A | P | P | P | E | F | G |
+
+** Ordenando y uniendo secuencias
+
+Las funciones de ordenamiento toman una secuencia y dos argumentos como predicado y devuelven una versión ordenada de la secuencia
+
+/Ejemplo 1/
+
+#+BEGIN_SRC lisp
+(write (sort '(2 4 7 3 9 1 5 4 6 3 8) #'<))
+#+END_SRC
+
+#+RESULTS:
+| 1 | 2 | 3 | 3 | 4 | 4 | 5 | 6 | 7 | 8 | 9 |
+
+
+
+#+BEGIN_SRC lisp
+(write (sort '(2 4 7 3 9 1 5 4 6 3 8) #'>))
+#+END_SRC
+
+#+RESULTS:
+| 9 | 8 | 7 | 6 | 5 | 4 | 4 | 3 | 3 | 2 | 1 |
+
+
+/Ejemplo 2/
+
+#+BEGIN_SRC lisp
+(write (merge 'vector #(1 3 5) #(2 4 6) #'<))
+#+END_SRC
+
+#+RESULTS:
+| 1 | 2 | 3 | 4 | 5 | 6 |
+
+#+BEGIN_SRC lisp
+(write (merge 'list #(1 3 5) #(2 4 6) #'<))
+#+END_SRC
+
+#+RESULTS:
+| 1 | 2 | 3 | 4 | 5 | 6 |
+
+** Predicados de secuencia
+
+Las funciones *every, some, notany, y notevery* son llamadas predicados de secuencias.
+
+Esas funciones interaccionan sobre las secuencias y prueba los predicados booleanos. 
+
+Todas esas funciones toman un predicado como su primer argumento y el resto de argumentos son secuencias.
+
+/Ejemplo/
+
+#+BEGIN_SRC lisp
+(write (every 'evenp #(2 4 6 8 10)))
+#+END_SRC
+
+#+RESULTS:
+: T
+
+#+BEGIN_SRC lisp
+(write (some 'evenp #(2 4 6 8 10 13 14)))
+#+END_SRC
+
+#+RESULTS:
+: T
+
+#+BEGIN_SRC lisp
+(write (every 'evenp #(2 4 6 8 10 13 14)))
+#+END_SRC
+
+#+RESULTS:
+: NIL
+
+#+BEGIN_SRC lisp
+(write (notany 'evenp #(2 4 6 8 10)))
+#+END_SRC
+
+#+RESULTS:
+: NIL
+
+#+BEGIN_SRC lisp
+(write (notevery 'evenp #(2 4 6 8 10 13 14)))
+#+END_SRC
+
+#+RESULTS:
+: T
+
+** Mapeando secuencias
+
+Ya hemos discutido las funciones de mapeo. Similar a la función *map* que nos permite aplicar una función a una subsecuencia de elementos de una o más secuencias. 
+
+La función *map* toma un argumento n de función y n secuencias y devuelve una nueva secuencia después de aplicar la función a la subsecuencia de elementos de las secuencias. 
+
+/Ejemplo/
+
+#+BEGIN_SRC lisp
+(write (map 'vector #'* #(2 3 4 5) #(3 5 4 8)))
+#+END_SRC
+
+#+RESULTS:
+| 6 | 15 | 16 | 40 |
+
+* Listas 
+
+Las listas han sido el más importante y el principal componente estructura de datos en el Lisp tradicional. En el día de hoy Lisp proporciona otras estructuras de datos como vectores, tablas asociativas, clases y estructuras.
+
+Las listas son simples listas unidas. En Lisp, las listas están construidas como una cadena de una simple estructura de registros llamada *cons* unidas juntas.
+
+** La estructura de registros cons  
+
+Un *cons* es una estructura de registro que contiene dos componentes llamados el *car* y el *cdr*. 
+
+Las células cons o cons son objetos que son pares de valores qeu son creados usando la función *cons*. 
+
+La función *cons* toma dos argumentos y devuelve una nueva célula cons que contiene los dos valores. Esos valores pueden ser referenciados a cualquier tipo de objeto.
+
+Si el segundo valor no es nil, o otra célula cons, entonces los valores son mostrados como un par de puntos encerrados por paréntesis. 
+
+Los dos valores en una célula cons son llamados el *car* y el *cdr*. La función *car* es usada para acceder al primer valor y la función *cdr* es usada para acceder al segundo valor. 
+
+/Ejemplo/
+
+#+BEGIN_SRC lisp
+(write (cons 1 2))
+#+END_SRC
+
+#+RESULTS:
+: (1 . 2)
+
+#+BEGIN_SRC lisp
+(write (cons 'a 'b))
+#+END_SRC
+
+#+RESULTS:
+: (A . B)
+
+#+BEGIN_SRC lisp 
+(write (cons 1 nil))
+#+END_SRC
+
+#+RESULTS:
+| 1 |
+
+#+BEGIN_SRC lisp
+(write (cons 1 (cons 2 nil)))
+#+END_SRC
+
+#+RESULTS:
+| 1 | 2 |
+
+#+BEGIN_SRC lisp
+(write (cons 1 (cons 2 (cons 3 nil))))
+#+END_SRC
+
+#+RESULTS:
+| 1 | 2 | 3 |
+
+#+BEGIN_SRC lisp
+(write (cons 'a (cons 'b (cons 'c nil))))
+#+END_SRC
+
+#+RESULTS:
+| A | B | C |
+
+#+BEGIN_SRC lisp
+(write ( car (cons 'a (cons 'b (cons 'c nil)))))
+#+END_SRC
+
+#+RESULTS:
+: A
+
+#+BEGIN_SRC lisp
+(write ( cdr (cons 'a (cons 'b (cons 'c nil)))))
+#+END_SRC
+
+#+RESULTS:
+| B | C |
+
+En el ejemplo anterior mostramo como las estructucturas cons pueden ser usada para crear una única lista unida, por ejemplo, la lista (A B) consiste en tres células cons enlazadas juntas por sus cdrs.
+
+En un diagrama lo podriamos expresar de la siguiente forma: 
+
+
+
+
+Listas en Lisp
+
+Aunque las células cons pueden ser usadas para crear listas, sin embargo, construir una lista usando llamadas a la función cons pude no ser la mejor solución. La función *list* es bastante más usada para la creación de listas en Lisp. 
+
+La función list puede tomar cualquier número de argumentos y como es una función, evaluará sus argumentos.
+
+Las funciones *fist* y *rest* nos dan el primer elemento y la parte restante de una lista. Los siguientes ejemplos demuestran los conceptos.
+
+/Ejemplo 1/
+
+#+BEGIN_SRC lisp
+(write (list 1 2))
+#+END_SRC
+
+#+RESULTS:
+| 1 | 2 |
+
+#+BEGIN_SRC lisp
+(write (list 'a 'b))
+#+END_SRC
+
+#+RESULTS:
+| A | B |
+
+
+#+BEGIN_SRC lisp
+(write (list 1 nil))
+#+END_SRC
+
+#+RESULTS:
+| 1 | NIL |
+
+#+BEGIN_SRC lisp
+(write (list 1 2 3))
+#+END_SRC
+
+#+RESULTS:
+| 1 | 2 | 3 |
+
+#+BEGIN_SRC lisp
+(write (list 'a 'b 'c))
+#+END_SRC
+
+#+RESULTS:
+| A | B | C |
+
+#+BEGIN_SRC lisp
+(write (list 3 4 'a (car '(b . c)) (* 4 -2)))
+#+END_SRC
+
+#+RESULTS:
+| 3 | 4 | A | B | -8 |
+
+#+BEGIN_SRC lisp
+(write (list (list 'a 'b) (list 'c 'd 'e)))
+#+END_SRC
+
+#+RESULTS:
+| A | B |   |
+| C | D | E |
+
+/Ejemplo 2/
+
+#+BEGIN_SRC lisp
+  (defun mi-libreria (titulo autor puntuación disponibilidad)
+    (list :titulo titulo :autor autor :puntuación puntuación :disponibilidad disponibilidad)
+    )
+
+(write (getf (mi-libreria "Juegos del Hambre" "Collins" 9 t) :titulo))
+#+END_SRC
+
+#+RESULTS:
+: Juegos del Hambre
+
+** Funciones para la manipulación de las listas
+
+| Sr.No | Función | Descripción                                                                                             |
+|-------+---------+---------------------------------------------------------------------------------------------------------|
+|     1 | car     | Toma una lista como argumento y devuelve su primer elemento                                             |
+|     2 | cdr     | Toma una lista como argumento y devuleve una lista sin el primer elemento                               |
+|     3 | cons    | Toma dos argumentos, un elemento y una lista y devuelve una lista con el elemento agregado al principio |
+|     4 | list    | Toma cualquier número de argumentos y devuelve una lista con los argumentos como miembros de esa lista  |
+|     5 | append  | Une dos o más listas en una                                                                             |
+|     6 | last    | Toma una lista y devuelve una lista que contiene el último elemento                                     |
+|     7 | member  | Toma dos argumentos el cual el segundo debe ser una lista, y añade el elemento al principio de la lista |
+|     8 | reverse | Toma una lista y la devuelve con el orden inverso                                                       |
+
+
+/Ejemplo 3/
+
+#+BEGIN_SRC lisp
+(write (car '(a b c d e f)))
+#+END_SRC
+
+#+RESULTS:
+: A
+
+#+BEGIN_SRC lisp
+(write (cdr '(a b c d e f)))
+#+END_SRC
+
+#+RESULTS:
+| B | C | D | E | F |
+
+#+BEGIN_SRC lisp
+(write (cons 'a '( b c)))
+#+END_SRC
+
+#+RESULTS:
+| A | B | C |
+
+#+BEGIN_SRC lisp
+(write (list 'a '( b c) '(e f)))
+#+END_SRC
+
+#+RESULTS:
+| A | (B C) | (E F) |
+
+#+BEGIN_SRC lisp
+(write (append '(b c) '(e f) '(p q) '() '(g)))
+#+END_SRC
+
+#+RESULTS:
+| B | C | E | F | P | Q | G |
+
+#+BEGIN_SRC lisp
+(write (last '(a b c d (e f))))
+#+END_SRC
+
+#+RESULTS:
+| E | F |
+
+#+BEGIN_SRC lisp
+(write (reverse '(a b c d (e f))))
+#+END_SRC
+
+#+RESULTS:
+| (E F) | D | C | B | A |
+
+
+** Concatenación de las funciones car y cdr 
+
+
+Las funciones *car* y *cdr* y sus combinaciones nos permiten extraer cualquier elemento o miembro en particular de la lista. 
+
+Sin embargo, las secuencias de las funciones de car y cdr pueden ser abreviadas concatenando letras para car y la d de cdr con las letras c y r.
+
+Por ejemplo, podemos escribir cadadr para abreviar la secuencia que llama a la función - car cdr car cdr. 
+
+Así, (cadadr '(a) (c d) (e f g)) devolverá d. 
+
+/Ejemplo 4/
+
+#+BEGIN_SRC lisp
+(write (cadadr '(a (c d) (e f g))))
+#+END_SRC
+
+#+RESULTS:
+: D
+
+#+BEGIN_SRC lisp
+(write (caar (list (list 'a 'b) 'c)))
+#+END_SRC
+
+#+RESULTS:
+: A
+
+#+BEGIN_SRC lisp
+(write (cadr (list (list 1 2) (list 3 4))))
+#+END_SRC
+
+#+RESULTS:
+| 3 | 4 |
+
+* Símbolos 
+
+En Lisp, un símbolo es el nombre que representa un objeto de datos y curiosamente es también un objeto de datos.
+
+Lo que hace un símbolo especial es que tienen un componente llamado la lista de propiedades o *plist*. 
+
+** Lista de propiedades
+
+Lisp permite asignar propiedades a símbolos. Por ejemplo, podemos tener el objeto 'persona'. Ahora nos gustaría que este objeto 'persona' tenga propiedades llamadas nombre, sexo, altura, peso, dirección, profesión, etc. Una propiedad es como un nombre de atributo. Una lista de propiedades es implementada como un lista con un número par (incluido el cero) de elementos. Cada par de elementos en la lista constituye una entrada; el primer elemento es el *indicador* y el segundo el *valor*.
+
+Cuando un símbolo es creado, su lista de propiedades está inicialmente vacía. Las propiedades son creadas usando *get* con la forma *setf*.
+
+Por ejemplo, la siguiente orden nos permite asignar las propiedades título, autor e imprenta y sus respectivos valores, a un objeto llamado (símbolo) 'libro'. 
+
+
+/Ejemplo 1/
+
+#+BEGIN_SRC lisp
+(write (setf (get 'libros 'titulo) '(Vete con el viento)))
+(write (setf (get 'libros 'autor) '(Margaret Michel)))
+(write (setf (get 'libros 'imprenta) '(Warner Books)))
+#+END_SRC
+
+El resultado será:
+
+#+BEGIN_SRC lisp
+(VETE CON EL VIENTO)
+(MARGARET MICHEL)
+(WARNER BOOKS)
+#+END_SRC
+
+
+Varias funciones de las listas de propiedades nos permiten asignar propiedades tan bien como recuperar, reemplazar o eliminar las propiedades de un símbolo.
+
+La función *get* devuelve la lista de propiedades de símbolo por un indicador dado. Sigue la siguiente sintaxis: 
+
+: get símbolo indicadro &opcional por-defecto
+
+La función *get* mira por la lista de propiedadess de un símbolo dado especificado por un indicador. Si lo encuentra entonces devuelve el correspondiente valor; de otro modo el valor por defecto será devuelto (o nil, si el valor por defecto no es especificado)
+
+/Ejemplo 2/
+
+#+BEGIN_SRC lisp
+(setf (get 'libros 'titulo) '(Vete con el viento))
+(setf (get 'libros 'autor) '(Margarret Michel))
+(setf (get 'libros 'imprenta)'(Warner Books))
+
+(write (get 'libros 'titulo))
+(terpri)
+(write (get 'libros 'autor))
+(terpri)
+(write (get 'libros 'imprenta))
+#+END_SRC
+
+Cuando ejecutemos este código obtendremos el siguiente resultado:
+
+#+BEGIN_SRC lisp
+(VETE CON EL VIENTO)
+(MARGARRET MICHEL)
+(WARNER BOOKS)
+#+END_SRC
+
+La función *symbol-plist* permite ver todas las propiedades de un símbolo.
+
+/Ejemplo 3/
+
+#+BEGIN_SRC lisp
+(setf (get 'annie 'edad) 43)
+(setf (get 'annie 'trabajo) 'contable)
+(setf (get 'annie 'sexo) 'mujer)
+(setf (get 'annie 'hijos) 3)
+
+(terpri
+
+(write (symbol-plist 'annie)))
+#+END_SRC
+
+Cuando ejecutamos el código, nos devolverá el siguiente resultado:
+
+#+BEGIN_SRC lisp
+(HIJOS 3 SEXO MUJER TRABAJO CONTABLE EDAD 43)
+#+END_SRC
+
+La función *remprop* elimina las propiedades especificadas de un símbolo.
+
+/Ejemplo 4/
+
+#+BEGIN_SRC lisp
+(setf (get 'annie 'edad) 43)
+(setf (get 'annie 'trabajo) 'contable)
+(setf (get 'annie 'sexo) 'mujer)
+(setf (get 'annie 'hijos) 3)
+
+(terpri)
+(write (symbol-plist 'annie))
+(remprop 'annie 'edad)
+(terpri)
+(write (symbol-plist 'annie))
+#+END_SRC
+
+Cuando ejecutemos el código éste nos devolverá:
+
+
+#+BEGIN_SRC lisp
+(HIJOS 3 SEXO MUJER TRABAJO CONTABLE EDAD 43)
+(HIJOS 3 SEXO MUJER TRABAJO CONTABLE)
+#+END_SRC
+
+* Vectores 
+
+Los vectores son arrays unidimensionales, por lo tanto son un subtipo de arrays. Los vectores y las listas son conjuntamente llamados secuencias. Por lo tanto todas las funciones genéricas para secuencias y arrays que ya hemos visto funcionan para vectores.
+
+** Creando vectores 
+
+Las funciones para vectores nos permiten crear vectores de un tamaño fijo con valores especificados. Toma cualquier número de argumentos y devuelve un vector que contiene esos argumentos.
+
+/Ejemplo 1/
+
+#+BEGIN_SRC lisp
+(setf v1 (vector 1 2 3 4 5))
+(setf v2 #(a b c d e))
+(setf v3 (vector 'p 'q 'r 's 't))
+
+(write v1)
+(terpri)
+(write v2)
+(terpri)
+(write v3)
+
+#+END_SRC
+
+
+Cuando ejecutemos este código el resultado será:
+
+#+BEGIN_SRC lisp
+#(1 2 3 4 5)
+#(A B C D E)
+#(P Q R S T)
+#+END_SRC
+
+Aquí usamos la sintaxis #(...) que es la notación literal para vectores. Tú puedes usar este #(...) para crear e incluir vectores literales en tu código. 
+
+Sin embargo, eso son vectores literales, así que modificarlos no está definido en Lisp. Por lo tanto, para programación, siempre deberíamos usar la función *vector*, o la función más general *make-array* para crear vectores si planeamos modificarlos. 
+
+La función *make-array* es la forma más genérica de crear un vector. Luego podemos acceder a los elementos del vector usando la función *aref* 
+
+/Ejemplo 2/
+
+#+BEGIN_SRC lisp
+  (setq a (make-array 5 :initial-element 0))
+  (setq b (make-array 5 :initial-element 2))
+
+  (dotimes (i 5)
+    (setf (aref a i) i))
+
+(write a)
+(terpri)
+(write b)
+(terpri)
+#+END_SRC
+
+
+Cuando ejecutemos el código obtendremos el siguiente resultado.
+
+#+BEGIN_SRC lisp
+#(0 1 2 3 4)
+#(2 2 2 2 2)
+#+END_SRC
+
+** Fill pointer
+
+La función *make-array* nos permite crear un vector redimensionable. 
+
+El argumento *fill-pointer* de la función matiene el registro de el número de elementos que realmente tiene el vector. 
+
+La función *vector-push* nos permite añadir un elemento al final del vector redimensionable. Esto incrementa el fill-pointer por uno.
+
+La función *vector-pop* nos devuelve el más reciente elemento añadido y decrece el fill-pointer en uno.
+
+/Ejemplo/
+
+#+BEGIN_SRC lisp
+(setq a (make-array 5 :fill-pointer 0))
+(write a)
+
+(vector-push 'a a)
+(vector-push 'b a)
+(vector-push 'c a)
+
+(terpri)
+(write a)
+(terpri)
+
+(vector-push 'd a)
+(vector-push 'e a)
+
+;esto no entrará al fector ya que su límite es 5
+(vector-push 'f a)
+
+(write a)
+(terpri)
+
+(vector-pop a)
+(vector-pop a)
+(vector-pop a)
+
+(write a)
+#+END_SRC
+
+Cuando ejecutemos el código el resultado será:
+
+#+BEGIN_SRC lisp
+#()
+#(A B C)
+#(A B C D E)
+#(A B)
+#+END_SRC
+
+Los vectores siendo secuencias, todas las funciones para las secuencias serán aplicables a los vectores. 
+
+* Conjuntos (set)
+
+Common Lisp no proporciona el tipo de dato conjunto. Sin embargo, proporciona un número de funciones que permiten a las operaciones de conjuntos ser desarrolladas en una lista. 
+
+Podemos añadir, eliminar y buscar elementos en una lista, basándose en varios criterios. También podemos desarrollar varias operaciones de conjuntos como: unión, intersección y diferencia. 
+
+** Implementando Conjuntos en Lisp 
+
+Los conjuntos, como las listas son generalmente implementados en términos de células cons. Sin embargo, por esta razón, las operaciones de conjuntos son menos y menos eficientes cuando mayor es el conjunto. 
+
+La función *adjoin* nos permite construir conjuntos. Esta función toma un elemento y una lista que represente un conjunto y devuelve una lista que representa el conjunto conteniendo el elemento y todos los elementos del conjunto original. 
+
+La función *adjoin* primero mira por el elemento
+ en la lista dada, y si lo encuentra, entonces devuelve la lista original; en otro caso crea unas nuevas células cons con su *car* como el elemento y el *cdr* apuntando a la lista original y devolviendo esta nueva lista.
+
+La función *adjoin* también toma *:key* y *:text* como palabras clave para argumentos. Esos argumentos son usados para comprobar si el elemento está presente en la lista original.
+
+Desde, que la función adjoin no modifica la lista original, para hacer un cambio en la lista misma, tenemos que asignar el valor de retorno por adjoin a la lista original, o también podemos usar el macro *pushnew* para añadir un elemento al conjunto. 
+
+/Ejemplo/
+
+#+BEGIN_SRC lisp
+;creando myset como un lista vacía
+(defparameter *myset* ())
+(adjoin 1 *myset*)
+(adjoin 2 *myset*)
+
+;adjoin no cambia el conjunto original
+(write *myset*)
+(terpri)
+(setf *myset* (adjoin 1 *myset*))
+(setf *myset* (adjoin 2 *myset*))
+
+;ahora el conjunto original es cambiado
+(write *myset*)
+(terpri)
+
+;añadiendo un valor existente
+(pushnew 2 *myset*)
+
+;el duplicado no es admitido
+(write *myset*)
+(terpri)
+
+;añadiendo un nuevo valor
+(pushnew 3 *myset*)
+(write *myset*)
+(terpri)
+#+END_SRC
+
+Cuando ejecutamos este código el resultado será:
+
+#+BEGIN_SRC lisp
+*MYSET*
+NIL
+(2 1)
+(2 1)
+(3 2 1)
+#+END_SRC
+
+** Comprobando los miembros
+
+Los miembros de un grupo de funciones nos permiten comprobar si un elemento es miembro de un conjunto o no. 
+
+Lo siguiente son las sintaxis de esas funciones -
+
+: member item lista &key :test :test-not :key
+: member-if predicado lista &key :key 
+: member-if-not predicado lista &key :key
+
+Esas funciones buscan la lista dada para un elemento dado que satisfaga la prueba. Si el elemento no es encontrado, entonces la función devuelve *nil*. En caso contrario, la cola de la lista con el elemento como primer elemento es devuelta.
+
+La búsqueda es conducida al alto nivel solo. 
+
+Esas funciones pueden ser usadas como predicados también.
+
+/Ejemplo/
+
+#+BEGIN_SRC lisp
+(write (member 'zara '(ayan abdul zara riyan nuha))
+(terpri)
+(write (member-if #'evenp '(3 7 2 5/3 'a)))
+(terpri)
+(write (member-if-not #'numberp '(3 7 2 5/3 'a 'b 'c)))
+#+END_SRC
+
+Cuando ejecutemos el código el resultado será:
+
+#+BEGIN_SRC lisp
+(ZARA RIYAN NUHA)
+(2 5/3 'A)
+('A 'B 'C)
+#+END_SRC
+
+** Unión en conjuntos
+
+El grupo de funciones para la Unión nos permite desarrollar la unión de conjuntos en dos listas proporcionadas como argumentos de esas funciones en la base de una prueba. 
+
+Lo siguiente son las sintaxis básicas de esas funciones:
+
+: union list1 list2 &key :test :test-not :key
+: nunion list1 list2 &key :test :test-not :key
+
+La función *union* toma dos listas y devuelve una nueva lista conteniendo todos los elementos de las listas previas. Si hay elementos duplicados, solo una copia es retenida en la lista devuelta.
+
+La función *nunion* realiza la misma operación pero destruye las listas argumento.
+
+/Ejemplo/
+
+#+BEGIN_SRC lisp
+    (setq set1 (union '(a b  c) '(c d e)))
+    (setq set2 (union '(#(a b) #(5 6 7) #(f h))
+                    '(#(5 6 7) #(a b) #(g h)) :test-not #'mismatch)
+          )
+
+(setq set3 (union '(#(a b) #(5 6 7) #(f h))
+'(#(5  6 7) #(a b) #(g h)))
+)
+(write set1)
+(terpri)
+(write set2)
+(terpri)
+(write set3)
+#+END_SRC
+
+
+Cuando ejecutemos este código el resultado será:
+
+#+BEGIN_SRC lisp
+
+(B A C D E)
+(#(F H) #(5 6 7) #(A B) #(G H))
+(#(F H) #(5 6 7) #(A B) #(5 6 7) #(A B) #(G H))
+
+#+END_SRC
+
+La función Union no trabaja como se esperaría sin los argumentos *:test-not #'mismatch* para una lista de tres vectores. Esto es porque las listas están hechas de células cons y aunque los valores nos parecen lo mismo aparentemente, la parte *cdr* de las células no coinciden, así que no son exactamente lo mismo para el interprete/compilador de Lisp. Esta es la razón; implementar grandes conjuntos no está aconsejado usando listas. En cambio sí funciona bien para pequeños conjuntos.
+
+** Intersección 
+
+Las funciones del grupo de la intersección nos permite implementar intersecciones en dos listas provistas como argumentos a esas funciones en la base de una prueba.
+
+Esta es la sintaxis de esas funciones -
+
+: intersection list1 list2 &key :test :test-not :key
+: intersection list1 list2 &key :test :test-not :key
+
+Esas funciones toman dos listas y devuelven una nueva listaa que contiene todos los elementos presentes en ambas listas. Si un elemento aparece en las dos listas la entrada redundante podría aparecer o no en el resultado.
+
+/Ejemplo/
+
+
+#+BEGIN_SRC lisp
+  (setq set1 (intersection '(a b c) '(c d e)))
+  (setq set2 (intersection '(#(a b) #(5 6 7) #(f h))
+                           '(#(5 6 7) #(a b) #(g h)) :test-not #'mismatch)
+        )
+
+  (setq set3 (intersection '(#(a b) '(5 6 7) #(f h))
+                           '(#(5 6 7) #(a b) #(g h)))
+        ) 
+  (write set1)
+  (terpri)
+  (write set2)
+  (terpri)
+  (write set3)
+#+END_SRC
+
+Cuando ejecutamos este código, nos devolverá:
+
+#+BEGIN_SRC lisp
+(C)
+(#(5 6 7) #(A B))
+NIL
+#+END_SRC
+
+
+La función *intersection* es una función destructiva, lo que quiere decir que destruye la lista original.
+
+** Diferencia 
+
+El grupo de funciones de Diferencia nos permite realizar la diferencia de dos listas provistas como argumentos de esas funciones en una prueba básica.
+
+La siguiente sintaxis es la que siguen esas funciones -
+
+: set-difference list1 list2 &key :test :test-not :key
+: nset-difference list1 list2 %key :test :test-not :key
+
+Las función *set-difference* nos devuelve una lista de los elementos de la primera lista que no aparecen en la segunda lista.
+
+/Ejemplo/
+
+#+BEGIN_SRC lisp
+  (setq set1 (set-difference '(a b c) '(c d e)))
+  (setq set2 (set-difference '(#(a b) #(5 6 7) #(f h))
+                               '(#(5 6 7) #(a b) #(g h)) :test-not #'mismatch)
+          )
+  (setq set3 (set-difference '(#(a b) #(5 6 7) #(f h))
+                             '(#(5 6 7) #(a b) #(g h)))
+        )
+
+(write set1)
+(terpri)
+(write set2)
+(terpri)
+(write set3)
+#+END_SRC
+
+Y el resultado será:
+
+#+BEGIN_SRC lisp
+(B A)
+(#(F H))
+(#(A B) #(5 6 7) #(F H))
+#+END_SRC
+
+* Árboles 
+
+Podemos construir árboles de datos con células cons, como listas de listas.
+
+Para implementar estructuras en árbol, tenemos que diseñar funcionalidades que pueden ir a través de las células cons, en específico, el orden, por ejemplo, pre ordenarlas, en ordenarlas y post ordenarlas para árboles binarios. 
+
+** Árboles como listas de listas
+
+Vamos a considerar una estructura de árbol hecha con células cons que formen la siguiente lista de listas - 
+
+: ((1 2) (3 4) (5 6))
+
+Esquemáticamente, esto puede expresarse así: 
+
+** Funciones para árboles en Lisp
+
+A pesar de que principalmente necesitarás escribir tus propias funcionalidades para árboles acordando tus especificaciones, Lisp proporciona al menos tres funciones que puedes usar. 
+
+Aparte de todas las funciones para listas, las siguientes funciones trabajan especialmente en estructuras de árboles - 
+
+| Sr.No. | Función                                        | Descripción                                                                                 |
+|--------+------------------------------------------------+---------------------------------------------------------------------------------------------|
+|      1 | copy-tree x & optional vecp                    | Devuelve una copia de células cons. Copia de forma recursiva las direcciones de car y cons. |
+|      2 | tree-equal x y & key :test :test-not :key      | Compara dos árboles de células cons, sus cars y cdrs son comparadas recursivamente.         |
+|      3 | subst new old tree & key :test :test-not :key  | Sustituye elementos viejos por nuevos elementos en el árbol                                 |
+|      4 | nsubst new old tree & key :test :test-not :key | Lo mismo que subst solo que destruye el árbol original                                      |
+|      5 | sublis alist tree & key :test :test-not :key   | Funciona como subst solo que toma como argumento una lista de asociación                    |
+|      6 | nsublis alist tree & key :test :testnot :key   | Igual que sublis pero uno versión destructiva                                               |
+
+
+/Ejemplo 1/
+
+#+BEGIN_SRC lisp
+(setq lst (list '(1 2) '(3 4) '(5 6)))
+(setq mylst (copy-lst lst))
+(setq tr (copy-tree lst))
+
+(write lst)
+(terpri)
+(write mylst)
+(terpri)
+(write tr)
+#+END_SRC
+
+Cuando ejecutemos el código obtendremos el siguiente resultado - 
+
+#+BEGIN_SRC lisp
+((1 2) (3 4) (5 6))
+((1 2) (3 4) (5 6))
+((1 2) (3 4) (5 6))
+#+END_SRC
+
+/Ejemplo 2/
+
+#+BEGIN_SRC lisp
+(setq tr '(((1 2 (3 4 5) ((7 8) (7 8 9))))))
+(write tr)
+(setq trs (subst 7 1 tr))
+(terpri)
+(write trs)
+#+END_SRC
+
+Cuando ejecutemos el código, obtendremos el siguiente resultado - 
+
+#+BEGIN_SRC lisp
+((1 2 (3 4 5) ((7 8) (7 8 9))))
+((7 2 (3 4 5) ((7 8) (7 8 9))))
+#+END_SRC
+
+** Construyendo nuestro propio árbol 
+
+Vamos a intentar construir nuestro propio árbol, usando las funciones para listas disponibles en Lisp.
+
+Primero crearemos un nuevo nodo que contiene algunos datos
+
+#+BEGIN_SRC lisp
+  (defun make-tree (item)
+    "crearemos un nuevo nodo"
+    (cons (cons item nil) nil)
+    )
+#+END_SRC
+
+Después añadiremos un nodo hijo al árbol - ello tomará dos nodos de árbol y añadiremos el segundo árbol como el hijo del primero
+
+#+BEGIN_SRC lisp
+  (defun add-child (tree child)
+    (setf (car tree) (append (car tree) child))
+    tree)
+#+END_SRC
+
+Esta función nos devolverá el primer hijo del árbol dado - tomará un nodo árbol y devolverá el primer hijo del nodo, o nil, si el nodo no tiene ningún nodo hijo.
+
+#+BEGIN_SRC lisp
+  (defun first-child (tree)
+    (if (null tree)
+        nil
+        (cdr (car tree))
+        )
+    )
+#+END_SRC
+
+Esta función nos devolverá el siguiente hermano de un nodo dado - tomará un nodo de un árbol como argumento y devolverá una referencia al próximo nodo hermano, o nil, si el nodo no existe. 
+
+#+BEGIN_SRC lisp
+  (defun next-sibling (tree)
+    (cdr tree)
+    )
+#+END_SRC
+
+Finalmente necesitamos una función que devuelva la información en un nodo - 
+
+#+BEGIN_SRC lisp
+  (defun data (tree)
+    (car (car tree))
+    )
+#+END_SRC
+
+/Ejemplo/
+
+En este ejemplo usaremos las funciones antes vistas 
+
+#+BEGIN_SRC lisp
+(defun make-tree (item)
+   "it creates a new node with item."
+   (cons (cons item nil) nil)
+)
+(defun first-child (tree)
+   (if (null tree)
+      nil
+      (cdr (car tree))
+   )
+)
+
+(defun next-sibling (tree)
+   (cdr tree)
+)
+(defun data (tree)
+   (car (car tree))
+)
+(defun add-child (tree child)
+   (setf (car tree) (append (car tree) child))
+   tree
+)
+
+(setq tr '((1 2 (3 4 5) ((7 8 9)))))
+(setq mytree (make-tree 10))
+
+(write (data mytree))
+(terpri)
+(write (first-child tr))
+(terpri)
+(setq newtree (add-child tr mytree))
+(terpri)
+(write newtree)
+#+END_SRC
+
+Cuando ejecutemos el código obtendremos el siguiente resultado - 
+
+
+#+BEGIN_SRC lisp
+10
+(2 (3 4 5) ((7 8) (7 8 9)))
+((1 2 (3 4 5) ((7 8) (7 8 9)) (10)))
+#+END_SRC
+
+* Tabla Hash o Matriz asociativa
+
+La tabla Hash representa un colección de pares palabra clave  y valor que están organizados basados en el código hash de la palabra clave. Se usa la palabra clave para acceder al elemento de la colección.
+
+Una tabla hash es usada cuando necesitamos acceder a elementos usando una palabra clave y podemos identificar un valor clave útil. Cada elemento en la tabla tiene su valor clave correspondiente. La palabra clave es usada para acceder a los elementos de la colección.
+
+** Creando una tabla Hash en Lisp
+
+En Common Lisp, una tabla hash es una colección de propósito general. Podemos usar objetos arbitrarios como valores clave o índices. 
+
+Cuando guardamos un valor en una tabla hash, creamos un par valor-clave y lo guardamos bajo esa clave. Más tarde podemos recuperar el valor de la tabla hash usando la misma clave. Cada clave mapea (o enlaza) a un valor único, aunque podemos guardar un nuevo valor en la clave.
+
+Las tablas hash, en Lisp, se pueden clasificar en tres tipos, basados en la forma en la que las palabras clave pueden ser comparadas, usando las funciones *eq, eql o equal*. Si la tabla hash es "hasheable" en objetos Lisp entonces las claves son comparadas con *eq o eql*. Si la tabla hash es "hasheable" en estructura de árbol, entonces podremos compararlas usando *equal*. 
+
+La función *make-hash-table* es usada para crear una tabla hash. La sintaxis para esta función es: 
+
+: make-hash-table &key :test :size :rehash-size :rehash-threshold
+
+Donde: 
+
++ El argumento *key* proporciona la clave 
++ El argumento *:test* determina como las claves son comparadas - puede tener 3 valores: #'eq, #'eql, o #'equal, o uno de los tres símbolos eq, eql, o equal. Si no es especificado eql es el asumido por defecto.
++ El argumento *:size* establece el tamaño inicial de la tabla. Suele ser un entero mayor que cero.
++ El argumento *:rehash-size* especifica cuanto se podrá incrementar el tamaño de la tabla cuando ésta esté llena. Esto puede ser un entero mayor que cero, el cual es el número de entradas a añadir, o puede ser un número con coma flotante mayor que 1, lo cual es el ratio de el nuevo tamaño a el viejo tamaño. El valor por defecto para este argumento depende de la implementación.
++ El argumento *:rehash-threshold* especifica como de llena puede estar la table antes de empezar a crecer. Este valor puede ser un entero mayor que cero y menor que el valor de :rehash-size (en cual caso será escalado cuando la table crezca), o puede ser un número con coma flotante entre cero y 1. El valor por defecto para este argumento depende de la implementación.
+
+También podemos llamar a la función make-hash-table sin argumentos.
+
+** Recuperando elementos y añadiendo elementos en una tabla hash
+
+
+La función *gethash* recupera un elemento de la tabla hash por búsqueda de su clave. Si no encuentra la clave, entonces devolverá nil.
+
+Sigue la siguiente sintaxis - 
+
+: gethash key hash-table &optional default
+
+donde - 
+
++ key: es la clave asociada 
++ hash-table: es la tabla hash que será buscada
++ default: Es el valor que será devuelto, si la entrada no es encontrada, la cual será nil si no especificamos otra cosa.
+
+
+La función *gethash* realmente devuelve 2 valores, el segundo es un valor predicado será true si la entrada es encontrada, y false si no lo es.
+
+Para añadir un elemento a una tabla hash, podremos usar la función *setf* al lado de la función *gethash*. 
+
+/Ejemplo/
+
+#+BEGIN_SRC lisp
+(setq empList (make-hash-table))
+(setf (gethash '0001 empList) '(Charlie Brown))
+(setf (gethash '002 empList) '(Freddie Seal))
+(write (gethash '001 empList))
+(terpri)
+(write (gethash '002 empList))
+#+END_SRC
+
+Cuando ejecutemos el código, nos devolverá el siguiente resultado - 
+
+#+BEGIN_SRC lisp
+(CHARLIE BROWN)
+(FREDDIE SEAL)
+#+END_SRC
+
+** Eliminando una entrada 
+
+La función *remhash* elimina cualquier entrada para una específica palabra clave en una tabla hash. Este es un predicado que es verdadero si había una entrada y falso si no lo hay. 
+
+La sintaxis para esta función es - 
+
+: remhash key hash-table
+
+/Ejemplo/
+
+#+BEGIN_SRC lisp
+(setq empList (make-hash-table))
+(setf (gethash '001 empList) '(Charlie Brown))
+(setf (gethash '002 empList) '(Freddie Seal))
+(setf (gethash '002 empList) '(Mark Mongoose))
+
+(write (gethash '001 empList))
+(terpri)
+(write (gethash '002 empList))
+(terpri)
+(write (gethash '003 empList))
+(remhash '003 empList)
+(terpri)
+(write (gethash '003 empList))
+#+END_SRC
+
+Cuando ejecutemos el código el resultado será:
+
+#+BEGIN_SRC lisp
+(CHARLIE BROWN)
+(FREDDIE SEAL)
+(MARK MONGOOSE)
+NIL
+#+END_SRC
+
+** La función maphash
+
+La función *maphash* permite aplicar una especifica función a cada par valor-clave en una tabla hash.
+
+Ésta toma dos argumentos, la función y una tabla hash e invoca la función una vez por cada par valor/clave en la tabla hash.
+
+/Ejemplo/
+
+#+BEGIN_SRC lisp
+(setq empList (make-hash-table))
+(setf (gethash '001 empList) '(Charlie Brown))
+(setf (gethash '002 empList) '(Freddie Seal))
+(setf (gethash '003 empList) '(Mark Mongoose))
+
+(maphash #'(lambda (k v) (format t "~a => ~a~%" k v)) empList)
+#+END_SRC
+
+Cuando ejecutemos el código, el resultado que nos devolverá será:
+
+#+BEGIN_SRC lisp
+1 => (MARK MONGOOSE)
+2 => (FREDDIE SEAl)
+3 => (CHARLIE BROWN)
+#+END_SRC
+
+* Entrada y Salida
+
+
+Common Lisp proporciona numerosas funciones de entrada-salida. Hasta ahora hemos usado la función format y print para la salida. En esta sección, veremos algunas de las funciones más comunes de entrada-salida que proporciona LISP. 
+
+** Funciones de entrada 
+
+La siguiente tabla proporciona las funciones de entradas más comúnmente usadas de LISP. 
+
+| No | Función                     | Descripción                                                              |
+|----+-----------------------------+--------------------------------------------------------------------------|
+|  1 | read                        | es la representación de un objeto desde la entrada-salida                |
+|  2 | read-preserving-whitespaces | es usado en ocasiones especiales                                         |
+|  3 | read-line                   | lee una línea de texto terminada en un salto de línea                    |
+|  4 | read-char                   | toma un caracter                                                         |
+|  5 | unread-char                 | pone el carácter más reciente leído.                                     |
+|  6 | peek-char                   | muestra el siguiente carácter leído.                                     |
+|  7 | listen                      | El predicado listen es verdadero si hay algún carácter accesible         |
+|  8 | read-char-no-hang           | similar a read-char pero no obtiene el carácter                          |
+|  9 | clear-input                 | limpia cualquier buffer asociado a la entrada-salida                     |
+| 10 | read-from-string            | toma un carácter de una cadena de texto y genera un objeto y lo devuelve |
+| 11 | parse-integer               | examina una subcadena entre :start y :end                                |
+| 12 | read-byte                   | lee un byte desde la entrada-salida binaria y lo devuelve como entero    |
+
+** Leyendo la entrada desde el teclado 
+
+La función *read* es usada para tomar la entrada desde el teclado. No necesita ningún argumento. 
+
+Por ejemplo, consideremos el siguiente código.
+
+#+BEGIN_SRC lisp
+(write (+ 15.0 (read)))
+#+END_SRC
+
+Asumiendo que el usuario teclee 10.2, esto devolverá 
+
+: 25.2
+
+La función *read* lee caracteres desde una entrada y los interpreta como una representación de objetos en Lisp. 
+
+Ejemplo: 
+
+#+BEGIN_SRC lisp
+;; la función AreaDelCirculo
+;; calcula el área de un círculo 
+;; usando el radio entrado por teclado
+
+(defun AreaDelCirculo ()
+(terpri)
+(princ "Introduce el rádio: ")
+(setq radio (read))
+(setq area (* 3.1416 radio radio))
+(princ "Area: ")
+(write area))
+(AreaDelCirculo)
+#+END_SRC
+
+Cuando ejecutemos el código, devolverá el siguiente resultado - 
+
+: Introduce el rádio: 5 (STDIN Input)
+: Area: 78.53999
+
+/Ejemplo/
+
+Vamos a crear un nuevo fichero llamado main.lisp y escribiremos lo siguiente.
+
+#+BEGIN_SRC lisp
+(with-input-from-string (stream "Welcome to Tutorials Point!")
+   (print (read-char stream))
+   (print (read-char stream))
+   (print (read-char stream))
+   (print (read-char stream))
+   (print (read-char stream))
+   (print (read-char stream))
+   (print (read-char stream))
+   (print (read-char stream))
+   (print (read-char stream))
+   (print (read-char stream))
+   (print (peek-char nil stream nil 'the-end))
+   (values)
+)
+#+END_SRC
+
+Y el resultado será: 
+
+#+BEGIN_SRC lisp
+#\W 
+#\e 
+#\l 
+#\c 
+#\o 
+#\m 
+#\e 
+#\Space 
+#\t 
+#\o 
+#\Space 
+#+END_SRC
+
+** Funciones de salida
+
+Todas las funciones de salida en Lisp toman un argumento opcional llamado output-stream, a donde la salida es enviada. Si no se menciona o es nil, el output-stream por defecto es el valor  de la variable *standard-output*.
+
+La siguiente tabla proporciona lo más comúnmente usados funicones de salida de Lisp.
+
+| Sr.No | Función          | Descripción                                                               |
+|-------+------------------+---------------------------------------------------------------------------|
+|     1 | write            | Escribe el objeto a la salida output-stream                               |
+|     2 | prin1            | Escribe el objeto tal cual                                                |
+|     3 | print            | Escribe el objeto precedido de una salto de línea y seguido de un espacio |
+|     4 | pprint           | Es como print pero el espacio es omitido                                  |
+|     5 | princ            | Es como prin1 excepto que la salida no tiene caracter de escape           |
+|     6 | write-to-string  | El objeto es expresado como una cadena de caractéres                      |
+|     7 | print1-to-string | Igual que el anterior                                                     |
+|     8 | princ-to-string  | Igual que el anterior                                                     |
+|     9 | write-char       | Devuelve caractéres                                                       |
+|    10 | write-string     | Devuelve los caracteres de una subcadena de una cadena de texto           |
+|    11 | write-line       | Igual que write-string pero con un salto de línea Después                 |
+|    12 | terpri           | Devuelve un salto de linea                                                |
+|    13 | fresh-line       | Devuelve la salida con una nueva línea si la salida no está listaa        |
+|    14 | finish-output    | Se asegura que toda la salida ha sido enviada                             |
+|    15 | force-output     |                                                                           |
+|    16 | clear-output     |                                                                           |
+|    17 | write-byte       | Escribe un byte el valor del entero                                       |
+
+
+** Ejemplo 
+
+Veamos el siguiente código 
+
+#+BEGIN_SRC lisp
+;este programa recibe un número y lo dobla
+(defun DoubleNumber(
+(terpri)
+(princ "Introduce el número: ")
+(setq n1 (read))
+(setq doubled (* 2.0 n1))
+(princ "El número: ")
+(write n1)
+(terpri)
+(princ "El número doblado: ")
+(write doubled)
+) 
+#+END_SRC  
+
+Cuando ejecutes el código, devolverá el siguiente resultado.
+
+#+BEGIN_SRC 
+Introduce el número: 3456.78 (STDIN Intput)
+El número: 3456.78
+El número doblado: 6913.56
+#+END_SRC
+
+** Formateo de la Salida
+
+La Función *format* es usadapara producir un texto bien formateado. Tiene la siguiente sintaxis -
+
+format destino cadena-de-control &rest argumentos 
+
+Donde: 
+
++ El destino es la salida estándar
++ La cadena de control mantiene los caractéres que van a salir y la directiva de impresión.
+
+Una *directiva de formateo* consiste en una tilde (~), un prefijo opcional separado por comas, dos puntos (:) opcionales, una arroba (@) modificadora, y un solo carácter que indica qué tipo de directiva es.
+
+Los prefijos son generalmente enteros.
+
+| Sr.No. | Directiva | Descripción                                                    |
+|--------+-----------+----------------------------------------------------------------|
+|      1 | ~A        | Es seguido por un argumento ASCII                              |
+|      2 | ~S        | Es seguido por una expresión-S                                 |
+|      3 | ~D        | Es seguido por un argumento decimal                            |
+|      4 | ~B        | Es seguido por un argumento binario                            |
+|      5 | ~O        | Es seguido por un argumento octal                              |
+|      6 | ~X        | Es seguido por un argumento hexadecimal                        |
+|      7 | ~C        | Es seguido por un argumento con caracteres                     |
+|      8 | ~F        | Es seguido por un argumento con punto flotante                 |
+|      9 | ~E        | Es seguido por un argumento punto flotante exponencial         |
+|     10 | ~$        | Es seguido por un argumento Dolar y punto flotante             |
+|     11 | ~%        | Una nueva línea es dibujada                                    |
+|     12 | ~*        | El siguiente argumento es ignorado                             |
+|     13 | ~?        | El siguiente argumento debe ser una cadena y después una lista |
+
+
+** Ejemplo 
+
+Vamos a reescribir el programa para calcular el área de un circulo.
+
+Crearemos un nuevo código fuente llamado *main.Lisp* y escribiremos el siguiente código
+
+#+BEGIN_SRC lisp
+(defun AreaDelCirculo()
+(terpri)
+(princ "Introduce el radio: ")
+(setq radio (read))
+(setq area (* 3.1416 radio radio))
+(format t "Radio: = ~F~% Area = ~F" radio area)
+)
+#+END_SRC
+
+Cuando ejecutemos el código éste nos devolverá el siguiente resultado - 
+
+#+BEGIN_SRC
+Introduce el radio: 10.234 (STDIN Input)
+Radio: = 10.234
+Area = 329.03473
+#+END_SRC
+
+* Entrada y Salida de ficheros
+
+Hemos discutido sobre como la estandar entrada y salida es manejada por Common Lisp. Todas esas funciones funcionan para leer y escribir texto en un fichero bianrio también. Solo que en este caso no usamos flujo de entrada y salida estandar, pero un flujo creado para el propósito específico de escribir o leer de y para archivos. 
+
+En este capítulo veremos como Lisp puede crear, abrir, cerrar archivos de texto o binarios para guardar datos.
+
+Una archivo representa una secuencia de bytes, no importa si es un fichero de texto o es binario. Este capítulo nos llevará a través de importantes funciones/macros para manejar archivos.
+
+** Abriendo ficheros
+
+Podemos usar la función *open* para crear un nuevo fichero o abrir un fichero existente. Es la Función más básica para abrir un archivo. Sin embargo, el *with-open-file* es normalmente más conveniente y de más comúnmente usado,como veremos más tarde.
+
+Cuando un fichero es abierto, un objeto flujo es construido para representarlo en el entorno de Lisp. Todas las operaciones en el flujo son básicamente equivalentes a operaciones en el archivo.
+
+La sintásis de la Función *open* es - 
+
+: open nombre-fichero &key :direction :element-type :if-exits :if-does-not-exists :external-format
+
+Dónde, 
+
++ El argumento nombre-fichero es el nombre del fichero que vamos a abrir o crear
++ El argumento keyword (palabra clave) especifica el tipo de fluo y error manejado.
++ La palabra clave :direction  especifica si el flujo es manejado como entrada, salida o ambos, y toma los siguientes valores:
+  + :input - para flujo entrantes (valor por defecto)
+  + :output - para flujo saliente
+  + :io - para un flujo bidireccional
+  + :probe - para comprobar si el archivo existe; el flujo es abierto y entonces cerrado
++ El element-type especifica el tipo de la unidad de transacción para el flujo.
++ El argumento :if-exits especifica la acción que realizará si :direction es :output o :io y un fichero con el mismo nombre ya existe. Si la direction es :input o :probe, este argumento será ignorado. Toma los siguientes valores
+  + :error - señala un error 
+  + :new-version - crea un nuevo archivo con el mismo nombre pero con un número de versión mayor
+  + :rename - Renombra el fichero existente
+  + :rename-and-delete - Renombra el archivo existente y lo borra
+  + :append - Lo agrega al fichero existente
+  + :supersede - Sustituye el archivo existente
+  + nil -No crea el fichero o incluso el flujo solo devuelve un nil para indicar el error
++ El argumento :if-does-not-exists especifica la acción que tomará si un archivo de un nombre específico no existe. Toma los siguientes valores 
+  + :error - Señala el error
+  + :create - Crea un archivo vacío con el nombre especificado y lo usa
+  + nil - No crea el archivo o el flujo y devuelve un nil para indicar el error
++ El argumento :external-format especifica un esquema implementado y reconocido para representar los caracteres en el archivo
+
+
+
+Por ejemplo, podemos abrir un archivo llamado myfile.txt guardado en la carpeta /tmp de la siguiente manera - 
+
+#+BEGIN_SRC lisp
+(open "/tmp/myfile.txt")
+#+END_SRC
+
+** Escribiendo y leyendo desde ficheros
+
+El *with-open-file* permite leer o escribir en un archivo, usando la variable de flujo asociada con la transacción lectura/escritura. Una vez que el trabajo es realizado, automáticamente se cerrará el archivo. Esto es extremadamente conveniente para usar. Se sigue la siguiente sintaxis
+
+: with-open-file (stream filename {options}*) {declaration}* {form}* 
+
++ filename es el nombre del archivo que será abierto: puede ser una cadena de caracteres, una ruta o un flujo.
++ Las opciones son las mismas que los argumentos claves de la Función *open**
+
+*** Ejemplo 1
+
+Vamos a crear un fichero fuente  llamado main.lisp y escribiremos lo siguiente.
+
+#+BEGIN_SRC lisp
+(with-open-file (stream "/tmp/myfile.txt" :direction :output)
+(format stream "Bienvendios a nuestros tutoriales!")
+(terpri stream)
+(format stream "ESto es la base de datos de los tutoriales")
+(terpri stream)
+(format stream "Envía tus tutoriales, artículos y trabajos a nuestros directorio de tutoriales.")
+)
+#+END_SRC
+
+Como vemos todas la funciones discutidas en los capítulos previos tales como terpri y format están funcionando en el archivo que hemos creado aquí.
+
+Cuando se ejecute el código, no devolverá nada, sin embargo, nuestros datos serán escritos en el archivo. Las palabras clave *:direction* y *:output* nos permite hacer esto.
+
+Sin embargo, para leer este archivo usamos la función *read-line*. 
+
+*** Ejemplo 2
+
+#+BEGIN_SRC lisp
+(let ((in (open "/tmp/file.txt" :if-does-not-exists nil)))
+   (when in
+     (loop for line = (read-line in nil)
+
+     while line do (format t "~a~%" line))
+     (close in)
+   )
+)
+#+END_SRC
+
+Cuando ejecutemos este código  devolverá el siguiente resultado 
+
+#+BEGIN_SRC
+Bienvenidos a nuestros tutoriales!
+Esto es la base de datos de los tutoriales
+Envía tus tutoriales, artículos y trabajos a nuestro directorio de tutoriales
+#+END_SRC
+
+** Cerrando archivos
+
+Para cerrar un flujo se usa la función *close*
+
+* Estructuras
+
+Las estructuras es un tipo de datos definidos por el usuario, el cual permite combinar datos de diferntes tipos.
+
+Las estructuras son usadas para representar registros. Supongamos que queremos registrar los libros en una biblioteca. Podriamos querer seguir los siguietnes atributos de cada libro - 
+
++ Titulo
++ Autor
++ Resumen 
++ ID del libro 
+
+** Definiendo una estructura 
+
+El macro *defstruct* en Lisp nos permite definir una estructura abstracta de registros. La declaración *defstruct* define un nuevo tipo de dato, con más de un miembro para un programa.
+
+Para discutir el formato del macro *defstruct*, escribiremos la definición de la estructura de un libro. Lo podemos definir de la siguiente manera:
+
+#+BEGIN_SRC lisp
+(defstruct libro
+titulo
+autor
+resumen
+id-libro
+)
+#+END_SRC
+
+Fijemonos en lo siguiente:
+
++ La siguiente declaración crea una estructura de libro con cuatro componentes nombrados. Así cada libro creado será un objeto de esta estructura.
++ Se definen cuatro funciones llamadas libro-titulo, libro-autor, libro-resumen y libro-id-libro, las cuales toman un argumento, una estructura libro, y devolverá los campos titulo, autor, resumen y id-libro del objeto libro. Esas funciones son llamadas las *funciones de acceso*.
++ El símbolo libro se transforma en un tipo de dato y podemos comprobarlo usandoel predicado *typep*.
++ Habrá también una función implícita llamada *libro-p*,la cual es un predicado que será verdadero si el argumento es un libro y será falso en caso distinto.
++ Otra función implícita llamada *make-libro* será creada, la cual es un *constructor*, que cuando es invocada crea una estructura de datos con cuatro componentes, adecuadas para usarlas con las funciones de acceso.
++ La *Sintáxis #S* se refiere a una estructura, y se puede usar para leer o imprimir instancias de un libro.
++ Una función implícita llamada copy-libro de un argumento es también definida. Toma un objeto libro y crea otro objeto libro, el cual es una copia del primero. Esta función es llamada la *la función copista*.
++ Podemos usar *setf*para alterar el componente de un libro, por ejemplo:
+
+#+BEGIN_SRC lisp
+(setf (libro-id-libro libro3) 100)
+#+END_SRC
+
+*** Ejemplo 
+
+#+BEGIN_SRC lisp
+(defstruct libro
+titulo
+autor
+resumen
+id-libro
+)
+
+(setq libro1 (make-libro :titulo "C programming"
+:author "Nuha Ali"
+:resumen "C-Programming Tutorial"
+:id-libro "478")
+)
+(setq libro2 (make-libro :titulo "Telecom Billing"
+:author "Zara Ali"
+:resumen "C-Programming Tutorial"
+:id-libro "501")
+)
+
+(write libro1)
+(terpri)
+(write libro2)
+(setq libro3 (copy-libro libro1))
+(setf (libro-id-libro libro3) 100)
+(terpri)
+(write libro3)
+#+END_SRC
+
+Cuando ejecutemos el código obtendremos el siguiente resultado - 
+
+#+BEGIN_SRC
+#S(LIBRO :TITULO "C-Programming" :AUTOR "Nuha Ali" :RESUMEN "C-Programming Tutorial" :ID-LIBRO "478")
+#S(LIBRO :TITULO "Telecom Billing" :AUTOR "Zara Ali" :RESUMEN "C-Programming Tutorial" :ID-LIBRO "501")
+#S(LIBRO :TITULO "C-Programming" :AUTOR "Nuha Ali" :RESUMEN "C-Programming Tutorial" :ID-LIBRO 100)
+#+END_SRC
+
+* Paquetes en Lisp
+
+En terminos generales de los lenguajes de programación, un paquete está diseñado para proveer una forma de mantener un conjunto de nombres separados de otros. Los símbolos declarados en un paquete no entrarán en conflicto con los mismos símbolos declarados en otro. De esta forma los paquetes reducen los conflictos de nombres entre módulos de código independientes.
+
+El lector de Lisp mantiene una tabla de todos los símbolos que ha encontrado. Cuando encuentra una nueva secuencia de carateres, crea un nuevo símbolo y lo guarda en la tabla de símbolos. Esta tabla es llamada un paquete.
+
+El paquete actual es referido por una variable especial *package*.
+
+Hay dos paquetes predefinidos en Lisp - 
+
++ *common-lisp* - contiene los símbolos para todas las funciones y variables definidas
++ *common-lisp-user* usa el paquete common-lisp y todos los otros paquetes con herramientas de edición y depuración:: son llamadas cl-user abreviadamente
+
+** Funciones de paquetes en Lisp
+
+La siguiente tabla Proporciona las funciones más usadas para crear, usar y manipular paquetes - 
+
+| Sr.No | Función           | Descripción                                                  |
+|     1 | make-package      | Crea y devuelve un nuevo paquete con un nombre especificaco  |
+|     2 | in-package        | Hace el paquete actual                                       |
+|     3 | in-package        |                                                              |
+|     4 | find-package      | Busca un paquete.                                            |
+|     5 | list-all-packages | Devuelve una lista de los paquetes que existan en el sistema |
+|     6 | delete-package    | Borra un paquete                                             |
+|       |                   |                                                              |
+
+
+** Creando un paquete 
+
+La función *defpackage* es usada para crear un paquete definido por el usuario. Tiene la siguiente sintaxis - 
+
+#+BEGIN_SRC lisp
+(defpackage :package-name
+(:use :common-lisp ...)
+(:export :symbol1 :symbol2 ...)
+)
+#+END_SRC
+
+Donde, 
+
++ package-name es el nombre del paquete 
++ La palabra clave :use especifica los paquetes que el paquete necesita, por ejemplo, paquetes que definen funciones usados en este paquete.
++ La palabra clave :export especifica los símbolos que son externos en este paquete. 
+
+La función *make-package* es también usada para crear paquetes. La sintaxis para esta función es - 
+
+#+BEGIN_SRC lisp
+make-package package-name &key :nicknames :use
+#+END_SRC
+
+Los argumentos y las palabras clave tienen los mismos significados que antes.
+
+** Usando un paquete 
+
+Una vez que hemos creado el paquete, podemos usar el código en este paquete, haciendolo el paquete actual. El macro *in-package* hace un paquete actual en el entorno.
+
+*** Ejemplo
+
+Vamos a crear el siguiente código.
+
+#+BEGIN_SRC lisp
+(make-package :tom)
+(make-package :dick)
+(make-package :harry)
+(in-package tom)
+(defun hello()
+(write-line "Hola! Yo soy Tom")
+)
+
+(hello)
+(in-package dick)
+(defun hello()
+(write-line "Hola! Yo soy Dick")
+)
+
+(hello)
+(in-package harry)
+(defun hello()
+(write-line "Hola! Yo soy Harry")
+)
+
+(hello)
+(in-package tom)
+(hello)
+(in-package dick)
+(hello)
+(in-package harry)
+(hello)
+#+END_SRC
+
+Cuando ejecutemos el código, nos devolverá el siguiente resultado.
+
+#+BEGIN_SRC
+Hola! Yo soy Toma
+Hola! Yo soy Dick
+Hola! Yo soy Harry
+EVAL: variable TOM has no value
+#+END_SRC
+
+* Manejando errores en Lisp
+  
+En la terminología de Common Lisp, las excepciones son llamadas condiciones.
+
+De hecho, las condiciones son más generales que las excpeciones de los lenguajes tradicionales, porque una *condición* representa cualquier ocurrencia, error, o no, que puede afectar a varios niveles de la llamada a una función.
+
+La condición maneja mecanismos en Lisp, maneja tales situaciones en tales formas que las condiciones son usadas como señales de alarma (dicho por imprimir una advertencia) mientras que el nivel más alto de la llamada a la función pude seguir funcionando.
+
+La condición manejada en el sistema en Lisp tiene tres partes - 
+
++ Señalando una condición
++ Manejando la condición
++ Reiniciando el proceso 
+
+** Manejando una condición
+
+Vamos a tomar un ejemplode manejo de una condición generada de dividir por cero, para explicar los conceptos.
+
+Necesitamos hacer los siguientes pasos para manejar una condición - 
+
+*** Definir la Condición 
+
+  "Una condición es un objeto cuya clase indica la naturaleza general de la condición y cuya instancia lleva información sobre los detalles de las circunstancias particulares que llevan a la condición a ser señalada".
+
+  La macro *define-condition* es usada para definir una condición, la cual sigue la siguiente sintaxis - 
+
+  #+BEGIN_SRC lisp
+  (define-condition nombre-condicion (error)
+  ((texto :initarg :texto :reader texto))
+  )
+  #+END_SRC
+
+  Los objetos condición nuevos son creados con el macro *make-condition*, el cual inicializa los huecos de la nueva condición basados en el argumento *:initargs*
+
+  En nuestro ejemplo, el siguiente  código define la condición - 
+
+  #+BEGIN_SRC lisp
+  (define-condition on-division-by-zero (error)
+  ((message :initarg :message :reader message))
+  )
+  #+END_SRC
+
+
+*** Escribiendo los manejadores
+
+  Un manejador de condiciones es un código que es usado para manejar la condición señalada acto seguido. Está generalmente escrito en uno de las funciones de más alto nivel que son llamadas funciones de error. Cuando una Condición es señalada, el mecanismos de señalización busca por un manejador apropidado basado en una clase de condición.
+
+  Cada menajador consite en - 
+
++ Tipo especificado, que indica el tipo de condición que puede manejar
++ Una función que toma un único argumento, la Condición
+
+Cuando una condición es señalada, el mecanismo de señalización encuentro el manejador más recientemente establecido que es compatible con la el tipo de la condición y llama a su función.
+
+El macro *handler-case* establece una codición manejada. La básica forma de un handler-case - 
+
+#+BEGIN_SRC Lisp
+(handler-case expresion error-clause*)
+#+END_SRC
+
+Donde, cada clausula error es de la forma - 
+
+#+BEGIN_SRC lisp
+condition-type ([var] code)
+#+END_SRC
+
+*** Reinciando la fase
+
+Este es el código que realmente recupera tu programa de los errores, y los manejadores de condiciones pueden entonces manejar una condición por invocación de un reinicio apropiado. El código de reinicio es generalmente localizado en un nivel intermedio o bajo nivel de funciones y el manejador de condiciones están localizados en los niveles más altos de la aplicación.
+
+El macro *handler-bind* nos permite una función de reincio y continuar a un nivel bajo de funciones sin desenmarañar la fila de llamada a las funciones, en otras palabras, el flujo de control estará en el nivel más bajo de función.
+
+la forma básica de *handler-bind* es  como sigue - 
+
+#+BEGIN_SRC lisp
+(handler-bind (binding*) form*)
+#+END_SRC
+
+Donde cada enlace es una lista de lo siguiente - 
+
++ Un tipo de condición
++ Un manejador de funciones de un argumento
+
+El macro *invoke-restart* encuentra e invoca la más reciente enlace a la función de reinicio que se ha espcificado como argumento.
+
+Podemos tener múltiples reinicios. 
+
+*** Ejemplo 
+En este ejemplo, demostraremos los conceptos vistos escribiendo una función llamada función division, la cual crea una condición de error si el argumento del divisor es cero. Tenemos tres funciones anónimas que proporcionan tres formas de hacerlo, por retorno del valor 1, enviando un divisor 2 y recalculando o devolviendo 1.
+
+Veamos el siguiente código
+
+#+BEGIN_SRC lisp
+(define-condition on-division-by-zero (error)
+((message :initarg :message :reader message))
+)
+
+(defun handle-infinity ()
+(restart-case
+(let ((result 0))
+(setf result (division-function 10 0))
+(fomat t "Valor: ~a~%" result)
+)
+(just-continue () nil)
+)
+)
+
+(defun division-function (value1 value2)
+(restart-case
+(if (/= value2 0)
+(/ value1 value2)
+(error 'on-division-by-zero :message "el denominador es cero")
+)
+(return-zero () 0)
+(return-value (r) r)
+(recalc-using (d) (division-function value1 d))
+)
+)
+
+(defun high-level-code()
+(handler-bind
+(
+(on-division-by-zero
+#'(lambda (c)
+(format t "error señalado: ~a~%" (message c))
+(invoke-restart 'return-zero)
+)
+)
+(handle-infinity)
+)
+)              
+)
+(handler-bind
+(
+(on-division-by-zero
+#'(Lambda(c)
+(format t "error señalado: ~a~%" (message c))
+(invoke-restart 'just-continue   
+)
+)
+)
+(handly-infinity)
+)
+
+(format t "Hecho."))
+#+END_SRC
+
+
+Cuando ejecutamos el código el resultado será - 
+
+#+BEGIN_SRC lisp
+error señalado: el denominador es cero
+Value: 1
+error señalado: el denominador es cero
+Value: 5 
+error señalado: el denominador es cero
+Hecho.
+#+END_SRC
+
+Aparte del 'Sistema de condiciones', tal como hemos discutido, Common Lisp también proporciona varias funciones que pueden ser llamadas para señalar un error. El manejo de un error, cuando es señalado, sin embargo, es dependiente de la implementación.
+
+** Funciones de señalamiento de errores en Lisp
+
+La siguiente tabla proporciona las funciones más usadas para señalar advertencias, roturas, y errores fatales  y no fatales.
+
+El programa del usuario especifica un mensaje de error (cadena). Las funciones procesan este mensaje y puede o no  mostrarlo al usuario.
+
+Los mensajes de error podrían ser construidos aplicando la función *format*, podrían no contener una nueva línea al principio o al final, y no necesitan indicar un error, como el sistema Lisp se encarga de eso de acuerdo a las preferencias de estilo. 
+
+| Sr.No | Funciones | Descripción                                                                                                                |
+|-------+-----------+----------------------------------------------------------------------------------------------------------------------------|
+|     1 | error     | Señala un error fatal. Es imposible continuar con este tipo de error                                                       |
+|     2 | cerror    | Señala un error y entra en el modo depurador. Sin embargo, permite al programa continuar después de resolverlo             |
+|     3 | warn      | Muestra un mensaje de error pero no va al depurador                                                                        |
+|     4 | break     | Muestra el error y va directamente al depurador, sin permitir ninguna posibilidad de intercepción por el manejo de errores |
+
+*** Ejemplo 
+
+En este ejemplo, la función factorial calcula el factorial de un número, sin embargo, si el argumento es negativo, muestra una condición de error.
+
+#+BEGIN_SRC lisp
+(defun factorial(n)
+(cond ((or (not (typep x 'integer)) (minusp x))
+(error "~S es un número negativo" x))
+((zerop x) 1)
+(t (* x (factorial (- x 1))))
+)
+)
+
+(write(factorial 5))
+(terpri)
+(write(factorial -1))
+#+END_SRC
+
+Cuando ejecutemos este código el resultado será: 
+
+#+BEGIN_SRC
+120
+- -1 is un número negativo
+#+END_SRC
+
+* CLOS en Lisp
+
+Comon Lisp precede a las ventajas de la programacion orientada a objetos por varias decadas. Sin embargo, la programacion orientada a objetos fue incorporada en sus ultimas versiones.
+
+** Definiendo clases 
+
+El macro *defclass* nos permite crear clases definidas por el usuario. Se establece una clase como un tipo de dato. Sigue la siguiente sintaxis - 
+
+#+BEGIN_SRC lisp
+(defclass nombre-clase (nombre-superclase)
+(slot-description*)
+class-option))
+#+END_SRC
+
+El slot son variables que guardan datos o campos. 
+
+Un slot-description tiene la forma (nombre-slot opciones-slot*), donde cada opción es una palabra clave seguido por un nombre, expresiones u otras opciones. Las opciones más usadas son - 
+
++ *:accessor* nombre-funcion
++ *:initform* expresión
++ *:initarg* símbolo 
+
+Por ejemplo, vamos a definir una clase Caja, con tres slots longitud, anchura y altura
+
+#+BEGIN_SRC lisp
+(defclass Box ()
+(longitud
+anchura
+altura)
+)
+#+END_SRC
+
+** Proporcionando Acceso y Lectura/Escritura control a los Slot
+
+A menos que los slots tengan valores que puedan ser accesibles, leídos o escribibles, las clases son bastante inútiles.
+
+Podemos especificar *accessor* para cada slot cuando definimos una clase. Por ejmplo, tomemos nuestra clase Caja - 
+
+#+BEGIN_SRC lisp
+(defclass Caja()
+((longitud :accessor longitud)
+(anchura :accessor anchura)
+(altura :accessor altura)
+)
+)
+#+END_SRC
+
+También podemos especificar nombres de *accessor* separados para leer y escribir un slot. 
+
+#+BEGIN_SRC lisp
+(defclass Caja ()
+((longitud :reader get-longitud :writer set-logitud)
+(anchura :reader get-anchura :writer set-anchura)
+(altura :reader get-altura :writer set-altura)
+)
+)
+#+END_SRC
+
+** Creando una instancia de una clase 
+
+La función genérica *make-instance* crea y devuelve una nueva instancia de una clase.
+
+Sigue la siguiente sintaxis
+
+#+BEGIN_SRC lisp
+(make-instance clase {initarg valor}*)
+#+END_SRC
+
+*** Ejemplo 
+
+Vamos a crerar una clase Caja, con tres slots, longitud, anchura y altura. Usaremos esos slots apara acceder a los valores de esos campos.
+
+#+BEGIN_SRC lisp
+(defclass box()
+((longitud :accessor logitud-caja)
+(anchura :accessor anchura-caja)
+(altura :accesssor altura-caja)
+)
+)
+
+(setf item (make-instance 'caja))
+(setf (longitud-caja item) 10)
+(setf (anchura-caja item) 10)
+(setf (altura-caja item) 5)
+(format t "La longitud de la caja es ~d~%" (altura-caja item))
+(format t "La anchura de la caja es ~d~%" (anchura-caja item))
+(format t "La altura de la caja es ~d~%" (altura-caja item))
+#+END_SRC
+
+Cuando ejecutemos el código, nos devolverá el siguiente resultado 
+
+#+BEGIN_SRC lisp
+La longitud de la caja es 10
+La anchura de la caja es 10
+La altura de la caja es 5
+#+END_SRC
+
+** Definiendo un Método de Clase
+
+El macro *defmethod* nos permite definir un método dentro de una clase. El siguiente ejemplo extiende nuestra clase Caja para incluir un método llamado volumen.
+
+#+BEGIN_SRC lisp
+(defclass caja ()
+((longitud :accessor longitud-caja)
+(anchura :accessor anchura-caja)
+(altura :accessor altural-caja)
+(volumen :reader volumen)
+)
+)
+
+; método para calcular el volumen
+
+(defmethod volumen ((objecto caja))
+(* (longitud-caja objeto) (anchura-caja objeto) (altura-caja objeto))
+)
+
+;; estableciendo los valores
+
+(setf item (make-instance 'caja))
+(setf (longitud-caja item) 10)
+(setf (anchura-caja item) 10)
+(setf (altura-caja item) 5)
+
+;; mostrando los valores
+
+(format t "La longitud de la caja es ~d~%" (longitud-caja item))
+(format t "La anchura de la caja es ~d~%" (anchura-caja item))
+(format t "La altura de la caja es ~d~%" (altura-caja item))
+(format t "El volumen de la caja es~d~%" (volumen item))
+#+END_SRC
+
+Cuando ejecutemos el código, éste nos devolverá -
+
+: La longuitud de la caja es 10
+: La anchura de la caja es 10
+: La altura de la caja es 5
+: El volumen de la caja es 500
+
+** Herencia
+
+Lisp permite  definir un objeto en terminos de otro objeto. Esto es llamado *herencia*. Podemos crear una clase derivada añadiendo características que son nuevas o diferntes. La clase derivada hereda las funcionalidades de la clase padre. 
+
+El siguiente ejemplo explica esto - 
+
+*** Ejemplo 
+
+#+BEGIN_SRC lisp
+(defclasss caja ()
+((longitud :accessor longitud-caja)
+(anchura :accessor anchura-caja)
+(altura :accessor altura-caja)
+(volumen :reader volumen)
+)
+)
+
+;; método para calcular el volumen
+(defmethod volumen (objeto caja))
+(* (longitud-caja objeto) (anchura-caja objeto) (altura-caja objeto))
+)
+
+;; clase caja de madera que hereda de la clase caja 
+(defclass caja-madera (caja)
+((precio :accessor precio-caja)))
+
+; estableciendo los valores
+(setf item (make-instance 'caja-madera))
+(setf (longitud-caja item) 10)
+(setf (anchura-caja item) 10)
+(setf (altura-caja item ) 5)
+(setf (precio-caja item) 1000)
+
+;; mostrando los valores
+(format t "La longitud de la caja de madera es ~d~%" (longitud-caja item))
+(format t "La anchura de la caja de madera es ~d~%" (anchura-caja item))
+(format t "La altura de la caja de madera es ~d~%" (altura-caja item))
+(format t "El volumen de la caja de madera es ~d~%" (volumen-caja item))
+(format t "El precio de la caja de madera es ~d~%" (precio-caja item))
+#+END_SRC
+
+Cuando ejecutemos el código, nos devolverá el siguiente resultado - 
+
+: La longitud de la caja de madera es 10
+: La anchura de la caja de madera es 10
+: La altura de la caja de madera es 5
+: El volumen de la caja de madera es 500
+: El precio de la caja de madera es 1000
+
+
